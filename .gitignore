@@ -1,0 +1,24 @@
+# Dependencies
+node_modules
+
+# Cache
+/.cache
+
+# Builds
+/build
+/public/build
+/public/sw.js
+
+# local env files
+.env*
+!.env.example
+
+# Tests
+/coverage
+/test-results
+
+# lighthouse
+.lighthouseci/
+
+# OS-specific files
+**/.DS_Store
