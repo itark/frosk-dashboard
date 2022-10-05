@@ -9,6 +9,7 @@ import MainCard from 'ui-component/cards/MainCard';
 //table
 import { gridSpacing } from 'store/constant';
 import SecuritiesCard from './SecuritiesCard';
+import config from 'config';
 
 const FroskPage = () => {
     const [isLoading, setLoading] = useState(true);
@@ -18,7 +19,7 @@ const FroskPage = () => {
 
     
     useEffect(() => {
-    fetch("http://localhost:8080/frosk-analyzer/metadata")
+    fetch(config.baseApi+"/metadata")
         .then(res => res.json())
         .then(
         (result) => {

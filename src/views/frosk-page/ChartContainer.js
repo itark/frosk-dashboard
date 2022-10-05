@@ -6,6 +6,7 @@ import { priceData } from './priceData';
 import { volumeData } from './volumeData';
 
 import './styles.css';
+import config from 'config';
 
 export default function ChartContainer( {securityName}) {
   const chartContainerRef = useRef();
@@ -68,9 +69,8 @@ export default function ChartContainer( {securityName}) {
 
   }, []);
 
-  const getApiData =  () => {
-    fetch(
-      "http://localhost:8080/frosk-analyzer/prices?security="+securityName)
+  const getSecurityData =  () => {
+    fetch(config.baseApi+"/prices?security="+securityName)
       .then((response) => response.json())
       .then((response) => {
         candleSeries.current.setData(response)
@@ -80,7 +80,7 @@ export default function ChartContainer( {securityName}) {
 
   useEffect(() => {
   
-    getApiData();
+    getSecurityData();
 
   }, [securityName]);
 

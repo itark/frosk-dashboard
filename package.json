@@ -1,8 +1,8 @@
 {
-    "name": "berry-material-react-free",
+    "name": "frosk",
     "version": "3.2.0",
     "private": true,
-    "homepage": "https://berrydashboard.io/free",
+    "homepage": "https://it-arkitekten.nu/frosk",
     "dependencies": {
         "@emotion/cache": "^11.9.3",
         "@emotion/react": "^11.9.3",
