@@ -8,10 +8,7 @@ import MainCard from 'ui-component/cards/MainCard';
 
 //table
 import { gridSpacing } from 'store/constant';
-import PopularCard from './PopularCard';
 import SecuritiesCard from './SecuritiesCard';
-import AdvancedTable from './AdvancedTable';
-import { ReactChartContainer } from './ReactChartContainer';
 
 const FroskPage = () => {
     const [isLoading, setLoading] = useState(true);
