@@ -17,7 +17,7 @@ export default function ChartContainer( {securityName}) {
 
   useEffect(() => {
 
-    getApiData();
+    //getSecurityDataRaw();
 
     chart.current = createChart(chartContainerRef.current, {
       width: chartContainerRef.current.clientWidth,
@@ -77,6 +77,15 @@ export default function ChartContainer( {securityName}) {
         volumeSeries.current.setData(response);
       });
   };
+
+
+  // const getSecurityDataRaw =  () => {
+  //   fetch(config.baseApi+"/prices?security="+securityName)
+  //     .then((response) => {
+  //       console.log('RAW response',response);
+  //     });
+  // };
+
 
   useEffect(() => {
   

@@ -13,7 +13,7 @@ import React, {
 
 const Context = createContext();
 
-const initialData = [
+let initialData = [
 	{ time: '2018-10-11', value: 52.89 },
 	{ time: '2018-10-12', value: 51.65 },
 	{ time: '2018-10-13', value: 51.56 },
@@ -21,6 +21,30 @@ const initialData = [
 	{ time: '2018-10-15', value: 51.86 },
 	{ time: '2018-10-16', value: 51.25 },
 ];
+
+
+const initialData2 = [
+	{ time: '2022-10-02', value: 52.89 },
+	{ time: '2022-10-03', value: 51.65 },
+	{ time: '2022-10-04', value: 51.56 },
+	{ time: '2022-10-05', value: 50.19 },
+	{ time: '2022-10-06', value: 51.86 },
+	{ time: '2022-10-07', value: 51.25 },
+];
+
+
+const initialData3 = [
+	{ time: 1664705744, value: 52.89 },
+	{ time: 1664792144, value: 53.65 },
+	{ time: 1664878544, value: 55.56 },
+	{ time: 1664964944, value: 57.19 },
+	{ time: 1665051344, value: 58.86 },
+	{ time: 1665137744, value: 59.25 },
+];
+
+
+initialData = initialData3;
+
 const currentDate = new Date(initialData[initialData.length - 1].time);
 
 export const ReactChartContainer = props => {

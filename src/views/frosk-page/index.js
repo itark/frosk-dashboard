@@ -9,6 +9,7 @@ import MainCard from 'ui-component/cards/MainCard';
 //table
 import { gridSpacing } from 'store/constant';
 import SecuritiesCard from './SecuritiesCard';
+import { ReactChartContainer } from './ReactChartContainer';
 import config from 'config';
 
 const FroskPage = () => {

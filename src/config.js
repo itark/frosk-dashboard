@@ -5,8 +5,8 @@ const config = {
     defaultPath: '/dashboard/default',
     fontFamily: `'Roboto', sans-serif`,
     borderRadius: 12,
-    baseApi: 'https://itark.loca.lt/frosk-analyzer',
-    //baseApi: 'http://localhost:8080/frosk-analyzer',
+    //baseApi: 'https://itark.loca.lt/frosk-analyzer',
+    baseApi: 'http://localhost:8080/frosk-analyzer',
 };
 
 export default config;

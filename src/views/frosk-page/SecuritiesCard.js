@@ -57,21 +57,105 @@ const SecuritiesTable = ( {securities}) => {
         accessorKey: 'oneWeekPercent',
         header: '1w',
         size: 5,
+        Cell: ({ cell }) =>
+        <Box
+          sx={(theme) => ({
+            backgroundColor:
+              cell.getValue() < 0
+                ? theme.palette.error.dark
+                : cell.getValue() >= 0
+                ? theme.palette.success.dark
+                : theme.palette.success.dark,
+            borderRadius: '0.25rem',
+            color: '#fff',
+            maxWidth: '9ch',
+            p: '0.25rem',
+          })}
+        >
+          {cell.getValue()?.toLocaleString?.('en-US', {
+            style: 'percent',
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          })}
+      </Box>        
       },
       {
         accessorKey: 'oneMonthPercent',
         header: '1m',
         size: 5,
+        Cell: ({ cell }) =>
+        <Box
+          sx={(theme) => ({
+            backgroundColor:
+              cell.getValue() < 0
+                ? theme.palette.error.dark
+                : cell.getValue() >= 0
+                ? theme.palette.success.dark
+                : theme.palette.success.dark,
+            borderRadius: '0.25rem',
+            color: '#fff',
+            maxWidth: '9ch',
+            p: '0.25rem',
+          })}
+        >
+          {cell.getValue()?.toLocaleString?.('en-US', {
+            style: 'percent',
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          })}
+      </Box>
       },
       {
         accessorKey: 'threeMonthPercent',
         header: '3m',
         size: 5,
+        Cell: ({ cell }) =>
+        <Box
+          sx={(theme) => ({
+            backgroundColor:
+              cell.getValue() < 0
+                ? theme.palette.error.dark
+                : cell.getValue() >= 0
+                ? theme.palette.success.dark
+                : theme.palette.success.dark,
+            borderRadius: '0.25rem',
+            color: '#fff',
+            maxWidth: '9ch',
+            p: '0.25rem',
+          })}
+        >
+          {cell.getValue()?.toLocaleString?.('en-US', {
+            style: 'percent',
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          })}
+      </Box>
       },
       {
         accessorKey: 'sixMonthPercent',
         header: '6m',
         size: 5,
+        Cell: ({ cell }) =>
+        <Box
+          sx={(theme) => ({
+            backgroundColor:
+              cell.getValue() < 0
+                ? theme.palette.error.dark
+                : cell.getValue() >= 0
+                ? theme.palette.success.dark
+                : theme.palette.success.dark,
+            borderRadius: '0.25rem',
+            color: '#fff',
+            maxWidth: '9ch',
+            p: '0.25rem',
+          })}
+        >
+          {cell.getValue()?.toLocaleString?.('en-US', {
+            style: 'percent',
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          })}
+      </Box>        
       }
     ],
     [],
