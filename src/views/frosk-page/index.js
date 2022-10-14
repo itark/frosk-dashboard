@@ -12,6 +12,7 @@ import SecuritiesCard from './SecuritiesCard';
 import { ReactChartContainer } from './ReactChartContainer';
 import config from 'config';
 
+
 const FroskPage = () => {
     const [isLoading, setLoading] = useState(true);
     const [securities, setSecurities] = useState([]);
@@ -20,20 +21,20 @@ const FroskPage = () => {
 
     
     useEffect(() => {
-    fetch(config.baseApi+"/metadata")
-        .then(res => res.json())
-        .then(
-        (result) => {
-            setIsLoaded(true);
-            setLoading(false);
-            setSecurities(result);
-        },
-        (error) => {
-            setIsLoaded(true);
-            setLoading(false);
-            setError(error);
-        }
-        )
+        fetch(config.baseApi+"/metadata")
+            .then(res => res.json())
+            .then(
+            (result) => {
+                setIsLoaded(true);
+                setLoading(false);
+                setSecurities(result);
+            },
+            (error) => {
+                setIsLoaded(true);
+                setLoading(false);
+                setError(error);
+            }
+            )
     }, [])
 
     return (
@@ -41,12 +42,9 @@ const FroskPage = () => {
            <Grid item xs={12}>
             <Grid container spacing={gridSpacing}>
                 <Grid item lg={12}  md={4} xs={10}>
-                    <SecuritiesCard securities={securities}></SecuritiesCard>
+                    {securities ? <SecuritiesCard securities={securities}></SecuritiesCard>: null}
                 </Grid>
             </Grid>
-            {/* <Grid item xs={12}>
-                <ReactChartContainer></ReactChartContainer>
-            </Grid> */}
           </Grid>
         </MainCard>
     );

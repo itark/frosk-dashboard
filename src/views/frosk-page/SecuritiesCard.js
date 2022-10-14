@@ -1,26 +1,18 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import MaterialReactTable from 'material-react-table';
-import ChartContainer from './ChartContainer';
 import {
   Box,
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  IconButton,
-  MenuItem,
-  Stack,
   CardContent,
   Grid,
-  Tooltip,
 } from '@mui/material';
 
 import MainCard from 'ui-component/cards/MainCard';
+import { ReactChartContainer } from './ReactChartContainer';
+import { gridSpacing } from 'store/constant';
+import config from 'config';
 
-const SecuritiesTable = ( {securities}) => {
+const SecuritiesCard = ( {securities}) => {
   const columns = useMemo(
-    //column definitions...
     () => [
       {
         accessorKey: 'name',
@@ -32,134 +24,38 @@ const SecuritiesTable = ( {securities}) => {
         header: '1d',
         size: 5,
         Cell: ({ cell }) =>
-        <Box
-          sx={(theme) => ({
-            backgroundColor:
-              cell.getValue() < 0
-                ? theme.palette.error.dark
-                : cell.getValue() >= 0
-                ? theme.palette.success.dark
-                : theme.palette.success.dark,
-            borderRadius: '0.25rem',
-            color: '#fff',
-            maxWidth: '9ch',
-            p: '0.25rem',
-          })}
-        >
-          {cell.getValue()?.toLocaleString?.('en-US', {
-            style: 'percent',
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          })}
-      </Box>
+         <ColumnBox cell={cell}></ColumnBox>
       },
       {
         accessorKey: 'oneWeekPercent',
         header: '1w',
         size: 5,
         Cell: ({ cell }) =>
-        <Box
-          sx={(theme) => ({
-            backgroundColor:
-              cell.getValue() < 0
-                ? theme.palette.error.dark
-                : cell.getValue() >= 0
-                ? theme.palette.success.dark
-                : theme.palette.success.dark,
-            borderRadius: '0.25rem',
-            color: '#fff',
-            maxWidth: '9ch',
-            p: '0.25rem',
-          })}
-        >
-          {cell.getValue()?.toLocaleString?.('en-US', {
-            style: 'percent',
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          })}
-      </Box>        
+          <ColumnBox cell={cell}></ColumnBox>      
       },
       {
         accessorKey: 'oneMonthPercent',
         header: '1m',
         size: 5,
         Cell: ({ cell }) =>
-        <Box
-          sx={(theme) => ({
-            backgroundColor:
-              cell.getValue() < 0
-                ? theme.palette.error.dark
-                : cell.getValue() >= 0
-                ? theme.palette.success.dark
-                : theme.palette.success.dark,
-            borderRadius: '0.25rem',
-            color: '#fff',
-            maxWidth: '9ch',
-            p: '0.25rem',
-          })}
-        >
-          {cell.getValue()?.toLocaleString?.('en-US', {
-            style: 'percent',
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          })}
-      </Box>
+          <ColumnBox cell={cell}></ColumnBox>
       },
       {
         accessorKey: 'threeMonthPercent',
         header: '3m',
         size: 5,
         Cell: ({ cell }) =>
-        <Box
-          sx={(theme) => ({
-            backgroundColor:
-              cell.getValue() < 0
-                ? theme.palette.error.dark
-                : cell.getValue() >= 0
-                ? theme.palette.success.dark
-                : theme.palette.success.dark,
-            borderRadius: '0.25rem',
-            color: '#fff',
-            maxWidth: '9ch',
-            p: '0.25rem',
-          })}
-        >
-          {cell.getValue()?.toLocaleString?.('en-US', {
-            style: 'percent',
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          })}
-      </Box>
+          <ColumnBox cell={cell}></ColumnBox>
       },
       {
         accessorKey: 'sixMonthPercent',
         header: '6m',
         size: 5,
         Cell: ({ cell }) =>
-        <Box
-          sx={(theme) => ({
-            backgroundColor:
-              cell.getValue() < 0
-                ? theme.palette.error.dark
-                : cell.getValue() >= 0
-                ? theme.palette.success.dark
-                : theme.palette.success.dark,
-            borderRadius: '0.25rem',
-            color: '#fff',
-            maxWidth: '9ch',
-            p: '0.25rem',
-          })}
-        >
-          {cell.getValue()?.toLocaleString?.('en-US', {
-            style: 'percent',
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          })}
-      </Box>        
+          <ColumnBox cell={cell}></ColumnBox>
       }
     ],
     [],
-    //end
   );
 
   //optionally access the underlying virtualizer instance
@@ -167,11 +63,13 @@ const SecuritiesTable = ( {securities}) => {
   const [isLoading, setIsLoading] = useState(true);
   const [sorting, setSorting] = useState([]);
   const [security, setSecurity] = useState();
-
+  const [strategies, setStrategies] = useState();
+  
   useEffect(() => {
     if (typeof window !== 'undefined') {
       setIsLoading(false);
     }
+    getStrategies();
   }, []);
 
   useEffect(() => {
@@ -181,11 +79,51 @@ const SecuritiesTable = ( {securities}) => {
     }
   }, [sorting]);
 
+
+  const ColumnBox = ({cell}) => {
+    return (
+      <Box
+      sx={(theme) => ({
+        backgroundColor:
+          cell.getValue() < 0
+            ? theme.palette.error.dark
+            : cell.getValue() >= 0
+            ? theme.palette.success.dark
+            : theme.palette.success.dark,
+        borderRadius: '0.25rem',
+        color: '#fff',
+        maxWidth: '9ch',
+        p: '0.25rem',
+      })}
+      >
+      {(cell.getValue()*100)?.toLocaleString?.('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })}%
+    </Box> 
+    )
+  }
+
+  const getStrategies = () => {
+    const strats = [];
+    fetch(config.baseApi+"/strategies")
+      .then((response) => response.json())
+      .then((response) => {
+        for (let i = 0; i < response.length; i++) {
+          strats.push(  {
+            value: response[i],
+            label: response[i]
+          })
+        }
+        setStrategies(strats);
+      });
+  }
+
   return (
     <>
         <MainCard >
           <CardContent>
-              <Grid container spacing={3}>
+              <Grid container spacing={gridSpacing}>
                 <Grid item xs={2}>
                   <MaterialReactTable
                     muiTableBodyRowProps={({ row }) => ({
@@ -219,9 +157,9 @@ const SecuritiesTable = ( {securities}) => {
                     virtualizerProps={{ overscan: 20 }} //optionally customize the virtualizer
                   />
                 </Grid>
-              <Grid item xs={10} sx={{ pt: '16px !important' }}>
-                  { security ? <ChartContainer securityName={security}/>: null}
-              </Grid>
+                <Grid item xs={10} sx={{ pt: '16px !important' }}>
+                  { security ? <ReactChartContainer securityName={security} strategies={strategies}/>: null}    
+                </Grid>
             </Grid>
           </CardContent>
         </MainCard>  
@@ -229,4 +167,4 @@ const SecuritiesTable = ( {securities}) => {
   );
 };
 
-export default SecuritiesTable;
+export default SecuritiesCard;

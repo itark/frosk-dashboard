@@ -8,7 +8,7 @@ import { volumeData } from './volumeData';
 import './styles.css';
 import config from 'config';
 
-export default function ChartContainer( {securityName}) {
+export default function ChartContainer( {securityName, strategy}) {
   const chartContainerRef = useRef();
   const chart = useRef();
   const resizeObserver = useRef();
@@ -17,11 +17,10 @@ export default function ChartContainer( {securityName}) {
 
   useEffect(() => {
 
-    //getSecurityDataRaw();
-
     chart.current = createChart(chartContainerRef.current, {
       width: chartContainerRef.current.clientWidth,
-      height: chartContainerRef.current.clientHeight,
+      // height: chartContainerRef.current.clientHeight,
+      height: 600,
       layout: {
         backgroundColor: 'white',
         textColor: 'rgba(255, 255, 255, 0.9)',
@@ -44,6 +43,8 @@ export default function ChartContainer( {securityName}) {
         borderColor: '#485c7b',
       },
     });
+
+    chart.current.timeScale().fitContent();
 
     candleSeries.current = chart.current.addCandlestickSeries({
       upColor: '#4bffb5',
@@ -69,29 +70,66 @@ export default function ChartContainer( {securityName}) {
 
   }, []);
 
+  const markers = [];
+
   const getSecurityData =  () => {
     fetch(config.baseApi+"/prices?security="+securityName)
       .then((response) => response.json())
       .then((response) => {
         candleSeries.current.setData(response)
         volumeSeries.current.setData(response);
+        console.log('first price',response[0].time);
       });
   };
 
+  const getTradesData =  () => {
+    fetch(config.baseApi+"/trades?security="+securityName+"&strategy="+strategy)
+      .then((response) => response.json())
+      .then((response) => {
+        for (let i = 0; i < response.length; i++) {
+          if (response[i].type === 'SELL') {
+            markers.push({
+              time: response[i].dateReadable,
+              position: 'aboveBar',
+              color: '#e91e63',
+              shape: 'arrowDown',
+              text: 'Sell @ ' + Math.floor(response[i].price + 2),
+            });
+          } else {
+            markers.push({
+              time: response[i].dateReadable,
+              position: 'belowBar',
+              color: '#2196F3',
+              shape: 'arrowUp',
+              text: 'Buy @ ' + Math.floor(response[i].price - 2),
+            });
+          }
+        }
+        candleSeries.current.setMarkers(markers);
+      });
+  }
 
-  // const getSecurityDataRaw =  () => {
-  //   fetch(config.baseApi+"/prices?security="+securityName)
-  //     .then((response) => {
-  //       console.log('RAW response',response);
-  //     });
-  // };
+  useEffect(() => {
+    getSecurityData();
+    getTradesData();
+
+    chart.current.applyOptions({
+      watermark: {
+        visible: true,
+        fontSize: 24,
+        horzAlign: 'center',
+        vertAlign: 'center',
+        color: 'rgba(171, 71, 188, 0.5)',
+        text: securityName,
+      },
+    });
+
+  }, [securityName]);
 
 
   useEffect(() => {
-  
-    getSecurityData();
-
-  }, [securityName]);
+    getTradesData();
+  }, [strategy]);
 
   // Resize chart on container resizes.
   useEffect(() => {
