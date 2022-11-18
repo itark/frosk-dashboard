@@ -17,6 +17,7 @@ const UtilsTablerIcons = Loadable(lazy(() => import('views/utilities/TablerIcons
 // sample page routing
 const SamplePage = Loadable(lazy(() => import('views/sample-page')));
 const FroskPage = Loadable(lazy(() => import('views/frosk-page')));
+const SignalPage = Loadable(lazy(() => import('views/signal-page')));
 
 // ==============================|| MAIN ROUTING ||============================== //
 
@@ -89,7 +90,11 @@ const MainRoutes = {
         {
             path: 'frosk-page',
             element: <FroskPage />
-        }
+        },
+        {
+            path: 'signal-page',
+            element: <SignalPage />
+        }        
     ]
 };
 

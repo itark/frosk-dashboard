@@ -1,13 +1,13 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import MaterialReactTable from 'material-react-table';
 import {
-  Box,
   CardContent,
   Grid,
 } from '@mui/material';
 
 import MainCard from 'ui-component/cards/MainCard';
-import { ReactChartContainer } from './ReactChartContainer';
+import { Container } from '../../ui-component/frosk/cards/Container';
+import ColumnBox from '../../ui-component/frosk/ColumnBox';
 import { gridSpacing } from 'store/constant';
 import config from 'config';
 
@@ -79,31 +79,6 @@ const SecuritiesCard = ( {securities}) => {
     }
   }, [sorting]);
 
-
-  const ColumnBox = ({cell}) => {
-    return (
-      <Box
-      sx={(theme) => ({
-        backgroundColor:
-          cell.getValue() < 0
-            ? theme.palette.error.dark
-            : cell.getValue() >= 0
-            ? theme.palette.success.dark
-            : theme.palette.success.dark,
-        borderRadius: '0.25rem',
-        color: '#fff',
-        maxWidth: '9ch',
-        p: '0.25rem',
-      })}
-      >
-      {(cell.getValue()*100)?.toLocaleString?.('en-US', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      })}%
-    </Box> 
-    )
-  }
-
   const getStrategies = () => {
     const strats = [];
     fetch(config.baseApi+"/strategies")
@@ -158,7 +133,7 @@ const SecuritiesCard = ( {securities}) => {
                   />
                 </Grid>
                 <Grid item xs={10} sx={{ pt: '16px !important' }}>
-                  { security ? <ReactChartContainer securityName={security} strategies={strategies}/>: null}    
+                  { security ? <Container securityName={security} strategies={strategies}/>: null}    
                 </Grid>
             </Grid>
           </CardContent>

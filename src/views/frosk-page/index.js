@@ -9,7 +9,6 @@ import MainCard from 'ui-component/cards/MainCard';
 //table
 import { gridSpacing } from 'store/constant';
 import SecuritiesCard from './SecuritiesCard';
-import { ReactChartContainer } from './ReactChartContainer';
 import config from 'config';
 
 
@@ -38,15 +37,13 @@ const FroskPage = () => {
     }, [])
 
     return (
-        <MainCard title="Frosk Card">
-           <Grid item xs={12}>
+        <Grid item xs={12}>
             <Grid container spacing={gridSpacing}>
                 <Grid item lg={12}  md={4} xs={10}>
                     {securities ? <SecuritiesCard securities={securities}></SecuritiesCard>: null}
                 </Grid>
             </Grid>
-          </Grid>
-        </MainCard>
+        </Grid>
     );
 
 };

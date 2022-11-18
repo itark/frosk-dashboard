@@ -12,6 +12,7 @@ import React, {
 	useState,
 } from 'react';
 
+import { useTheme } from '@mui/material/styles';
 import {
 	TextField,
 	MenuItem,
@@ -21,48 +22,40 @@ import {
 
 import MainCard from 'ui-component/cards/MainCard';
 import { gridSpacing } from 'store/constant';
-import './styles.css';
+
+import '../../frosk/styles.css';
 import config from 'config';
 
 const Context = createContext();
 
-export const ReactChartContainer = props => {
-	const [strategy, setStrategy] = useState('RSI2Strategy');
-	const { securityName, strategies} = props;
+export const Container = props => {
+	const theme = useTheme();
+	const { securityName, strategies, initStrategy} = props;
+	const [strategy, setStrategy] = useState(initStrategy);
     const blue = '#2962FF';
 	const orange = '#e69138';
-
 	const [chartLayoutOptions, setChartLayoutOptions] = useState({});
 	const markers = [];
-	const indicatorsSeries = [];
-
 	const candleSeries = useRef(null);
 	const volumeSeries = useRef(null);
-	const lineSeries = useRef(null);
-	const indicatorSeries1 = useRef(null);
-	const indicatorSeries2 = useRef(null);
-	const areaSeries = useRef(null);
-
-	useEffect(() => {
-		//getStrategies();
-	}, []);
-
-	// useLayoutEffect(() => {
-	// 	getStrategies();
-	// }, []);
+	const shortEmaSeries = useRef(null);
+	const longEmaSeries = useRef(null);
+	const shortSmaSeries = useRef(null);
+	const longSmaSeries = useRef(null);
+	const pSarSeries = useRef(null);
+	const macdSeries = useRef(null);
+	const emaMacdSeries = useRef(null);
 
 	useEffect(() => {
 		console.log('securityName',securityName)
 		getSecurityData();
 		if (strategy) {
-			//getTradesData();
 			getFeaturedStrategy();
 		}
 	}, [securityName]);
 
 	useEffect(() => {
 		if (strategy) {
-			//getTradesData();
 			getFeaturedStrategy();
 		}
 		getFeaturedStrategy();
@@ -73,15 +66,7 @@ export const ReactChartContainer = props => {
 		  .then((response) => response.json())
 		  .then((response) => {
 			candleSeries.current.setData(response);
-			const lineData = response.map(datapoint => ({
-				time: datapoint.time,
-				value: datapoint.close,
-			}));
-			//lineSeries.current.setData(lineData);
-			//indicatorSeries.current.setData(lineData)
-			//console.log(lineSeries.current.seriesType()); 
 			volumeSeries.current.setData(response);
-			//areaSeries.current.setData(lineData);
 		  });
 	  };
 
@@ -89,57 +74,105 @@ export const ReactChartContainer = props => {
 		fetch(config.baseApi+"/featuredStrategy?security="+securityName+"&strategy="+strategy)
 		  .then((response) => response.json())
 		  .then((response) => {
-
 			console.log('featuredStrategies', response)
-			const shortEma = response.indicatorValues
-				.filter(o => o.name === 'shortEma')
-				.map(datapoint => ({
-					time: datapoint.time,
-					value: datapoint.value,
-					name: datapoint.name
-				}));
-			console.log('shortEma',shortEma);
-			const longEma = response.indicatorValues
-				.filter(o => o.name === 'longEma')
-				.map(datapoint => ({
-					time: datapoint.time,
-					value: datapoint.value,
-					name: datapoint.name
-				}));
-			console.log('longEma',longEma);		
-			indicatorSeries1.current.setData(shortEma);
-			indicatorSeries2.current.setData(longEma);
+			setShortEma(response);
+			setLongEma(response);
+			setParabolicSar(response);
+			setMacd(response);
+			setEmaMacd(response);
 
-			let trades = [];
-			if (response.trades) {
-				trades = response.trades
-				.map(datapoint => ({
-					dateReadable: datapoint.dateReadable,
-					price: datapoint.price,
-				}));
-			}
-			console.log('trades',trades);	
-			for (let i = 0; i < trades.length; i++) {
-				if (trades[i].type === 'SELL') {
-					markers.push({
-						time: trades[i].dateReadable,
-						position: 'aboveBar',
-						color: '#e91e63',
-						shape: 'arrowDown',
-						text: 'Sell @ ' + Math.floor(trades[i].price),
-					});
-				} else {
-					markers.push({
-						time: trades[i].dateReadable,
-						position: 'belowBar',
-						color: '#2196F3',
-						shape: 'arrowUp',
-						text: 'Buy @ ' + Math.floor(trades[i].price),
-					});
-				}
-			}
-			candleSeries.current.setMarkers(markers);
+			setMarkers(response);
 		  });
+	}
+
+	const setShortEma =  (response) => {
+		const shortEma = response.indicatorValues
+			.filter(o => o.name === 'shortEma')
+			.map(datapoint => ({
+				time: datapoint.time,
+				value: datapoint.value,
+				name: datapoint.name
+		}));
+		shortEmaSeries.current.setData(shortEma);
+	}
+
+	const setLongEma =  (response) => {
+		const longEma = response.indicatorValues
+			.filter(o => o.name === 'longEma')
+			.map(datapoint => ({
+				time: datapoint.time,
+				value: datapoint.value,
+				name: datapoint.name
+		}));
+		longEmaSeries.current.setData(longEma);
+	}
+
+	const setParabolicSar =  (response) => {
+		const pSar = response.indicatorValues
+			.filter(o => o.name === 'pSar')
+			.map(datapoint => ({
+				time: datapoint.time,
+				value: datapoint.value,
+				name: datapoint.name
+		}));
+		pSarSeries.current.setData(pSar);
+	}
+
+	const setMacd =  (response) => {
+		const macd = response.indicatorValues
+			.filter(o => o.name === 'macd')
+			.map(datapoint => ({
+				time: datapoint.time,
+				value: datapoint.value,
+				name: datapoint.name
+		}));
+		macdSeries.current.setData(macd);
+	}	
+
+	const setEmaMacd =  (response) => {
+		const emaMacd = response.indicatorValues
+			.filter(o => o.name === 'emaMacd')
+			.map(datapoint => ({
+				time: datapoint.time,
+				value: datapoint.value,
+				name: datapoint.name
+		}));
+		emaMacdSeries.current.setData(emaMacd);
+	}	
+
+	const setMarkers =  (response) => {
+
+		let trades = [];
+		if (response.trades) {
+			trades = response.trades
+			.map(datapoint => ({
+				dateReadable: datapoint.dateReadable,
+				price: datapoint.price,
+				type: datapoint.type,
+			}));
+		}
+		for (let i = 0; i < trades.length; i++) {
+			if (trades[i].type === 'SELL') {
+				markers.push({
+					time: trades[i].dateReadable,
+					position: 'aboveBar',
+					color: '#e91e63',
+					shape: 'arrowDown',
+					text: 'Sell ' + Math.floor(trades[i].price),
+				});
+			} else if (trades[i].type === 'BUY') {
+				markers.push({
+					time: trades[i].dateReadable,
+					position: 'belowBar',
+					color: '#2196F3',
+					shape: 'arrowUp',
+					text: 'Buy ' + Math.floor(trades[i].price),
+				});
+			} else {
+				console.error('trades[i].type',trades[i].type)
+			}
+		}
+		candleSeries.current.setMarkers(markers);
 	}
 
 	return (
@@ -186,31 +219,45 @@ export const ReactChartContainer = props => {
 									ref={volumeSeries}
 									color={blue}
 								/>	
-								{/* <Area
-									type={'area'}
-									ref={areaSeries}
-									color={lineColor}
-								/>	
 								<Line
-									type={'line'}
-									ref={lineSeries}
-									color={lineColor}
-								/>	 */}
+									type={'shortEma'}
+									ref={shortEmaSeries}
+									color={orange}
+								/>
+								<Line
+									type={'longEma'}
+									ref={longEmaSeries}
+									color={blue}
+								/>
 								<Line
 									type={'shortSma'}
-									ref={indicatorSeries1}
+									ref={shortSmaSeries}
 									color={orange}
 								/>
 								<Line
 									type={'longSma'}
-									ref={indicatorSeries2}
+									ref={longSmaSeries}
 									color={blue}
 								/>
+								<Line
+									type={'pSar'}
+									ref={pSarSeries}
+									color={orange}
+								/>		
+								<Line
+									type={'macd'}
+									ref={macdSeries}
+									color={theme.palette.success.dark}
+								/>	
+								<Line
+									type={'emaMacd'}
+									ref={emaMacdSeries}
+									color={theme.palette.orange.dark}
+								/>									
 							</Chart>
                         </Grid>
                     </Grid>
                 </MainCard>
-
 		</>
 	);
 };
@@ -370,6 +417,7 @@ export const Line = forwardRef((props, ref) => {
 					lineWidth: 1,
 					lastValueVisible: false,
 					priceLineVisible: false,
+					type: 'solid'
 				});
 			}
 			return this._line;

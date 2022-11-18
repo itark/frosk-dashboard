@@ -1,8 +1,8 @@
 // assets
-import { IconBrandChrome, IconHelp, IconHandRock } from '@tabler/icons';
+import { IconBrandChrome, IconHelp, IconHandRock, IconRocket } from '@tabler/icons';
 
 // constant
-const icons = { IconBrandChrome, IconHelp, IconHandRock };
+const icons = { IconBrandChrome, IconHelp, IconHandRock, IconRocket };
 
 // ==============================|| SAMPLE PAGE & DOCUMENTATION MENU ITEMS ||============================== //
 
@@ -20,12 +20,23 @@ const other = {
         // },
         {
             id: 'frosk-page',
-            title: 'Frosk',
+            title: 'Securities',
             type: 'item',
             url: '/frosk-page',
             icon: icons.IconHandRock,
             breadcrumbs: false
         },
+        {
+            id: 'signal-page',
+            title: 'Signals',
+            type: 'item',
+            url: '/signal-page',
+            icon: icons.IconRocket,
+            breadcrumbs: false
+        },
+        
+        
+
         // {
         //     id: 'documentation',
         //     title: 'Documentation',
