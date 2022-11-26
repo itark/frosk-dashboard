@@ -28,7 +28,7 @@ const other = {
         },
         {
             id: 'signal-page',
-            title: 'Signals',
+            title: 'Strategies',
             type: 'item',
             url: '/signal-page',
             icon: icons.IconRocket,

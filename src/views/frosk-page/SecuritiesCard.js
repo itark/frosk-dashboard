@@ -20,6 +20,11 @@ const SecuritiesCard = ( {securities}) => {
         size: 50,
       },
       {
+        accessorKey: 'bestStrategy',
+        header: 'Best strategy',
+        size: 50,
+      },
+      {
         accessorKey: 'oneDayPercent',
         header: '1d',
         size: 5,

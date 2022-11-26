@@ -16,24 +16,6 @@ const SignalPage = () => {
     const [error, setError] = useState(null);
     const [isLoaded, setIsLoaded] = useState(false);
 
-    
-    useEffect(() => {
-        fetch(config.baseApi+"/longtrades")
-            .then(response => response.json())
-            .then(
-            (response) => {
-                setIsLoaded(true);
-                setLoading(false);
-                setLongtrades(response);
-            },
-            (error) => {
-                setIsLoaded(true);
-                setLoading(false);
-                setError(error);
-            }
-            )
-    }, [])
-
     useEffect(() => {
         fetch(config.baseApi+"/featuredStrategies")
             .then(response => response.json())
@@ -41,7 +23,7 @@ const SignalPage = () => {
             (response) => {
                 setIsLoaded(true);
                 setLoading(false);
-               // console.log('response',response)
+                console.log('featuredStrategies',featuredStrategies)
                 setFeaturedStrategies(response);
             },
             (error) => {
@@ -54,10 +36,10 @@ const SignalPage = () => {
 
 
     return (
-        <Grid item xs={12}>
+        <Grid item>
             <Grid container spacing={gridSpacing}>
-                <Grid item lg={12}  md={4} xs={10}>
-                    {longtrades ? <SignalsCard featuredStrategies={featuredStrategies}></SignalsCard>: null}
+                <Grid item>
+                    {featuredStrategies ? <SignalsCard featuredStrategies={featuredStrategies}></SignalsCard>: null}
                 </Grid>
             </Grid>
         </Grid>

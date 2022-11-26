@@ -22,15 +22,14 @@ import {
 
 import MainCard from 'ui-component/cards/MainCard';
 import { gridSpacing } from 'store/constant';
-
 import '../../frosk/styles.css';
 import config from 'config';
 
 const Context = createContext();
 
-export const Container = props => {
+export const Container = (props) => {
 	const theme = useTheme();
-	const { securityName, strategies, initStrategy} = props;
+	const { securityName, strategies, initStrategy, featuredStrategy} = props;
 	const [strategy, setStrategy] = useState(initStrategy);
     const blue = '#2962FF';
 	const orange = '#e69138';
@@ -45,9 +44,9 @@ export const Container = props => {
 	const pSarSeries = useRef(null);
 	const macdSeries = useRef(null);
 	const emaMacdSeries = useRef(null);
+	const strategyEnabled = initStrategy === undefined ? false : true;
 
 	useEffect(() => {
-		console.log('securityName',securityName)
 		getSecurityData();
 		if (strategy) {
 			getFeaturedStrategy();
@@ -74,7 +73,6 @@ export const Container = props => {
 		fetch(config.baseApi+"/featuredStrategy?security="+securityName+"&strategy="+strategy)
 		  .then((response) => response.json())
 		  .then((response) => {
-			console.log('featuredStrategies', response)
 			setShortEma(response);
 			setLongEma(response);
 			setParabolicSar(response);
@@ -141,7 +139,6 @@ export const Container = props => {
 	}	
 
 	const setMarkers =  (response) => {
-
 		let trades = [];
 		if (response.trades) {
 			trades = response.trades
@@ -182,14 +179,14 @@ export const Container = props => {
                         <Grid item xs={12}>
                             <Grid container alignItems="center" justifyContent="space-between">
                                 <Grid item>
-                                    <Grid container direction="column" spacing={1}>
+                                {featuredStrategy ? <Grid container direction="column" spacing={1}>
                                         <Grid item>
-                                            <Typography variant="subtitle2">Total Growth</Typography>
+                                            <Typography variant="subtitle2">Total Profit</Typography>
                                         </Grid>
                                         <Grid item>
-                                            <Typography variant="h3">$2,324.00</Typography>
+                                            <Typography variant="h3">{featuredStrategy.totalProfit}%</Typography>
                                         </Grid>
-                                    </Grid>
+                                    </Grid> : null}
                                 </Grid>
                                 <Grid item>
                                     <TextField
@@ -197,6 +194,7 @@ export const Container = props => {
                                         select
                                         value={strategy}
                                         onChange={(e) => setStrategy(e.target.value)}
+										disabled={strategyEnabled}
                                     >
                                         {strategies.map((option) => (
                                             <MenuItem key={option.value} value={option.value}>
