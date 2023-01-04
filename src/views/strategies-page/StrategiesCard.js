@@ -30,47 +30,7 @@ import config from 'config';
 import generic from 'assets/images/generic.svg';
 import Kmd from  "cryptocurrency-icons/svg/color/kmd.svg"
 
-
-const CardWrapper = styled(MainCard)(({ theme }) => ({
-  //height: 900,
-  backgroundColor: theme.palette.secondary.dark,
-  color: '#fff',
-  overflow: 'hidden',
-  position: 'relative',
-  '&:after': {
-      content: '""',
-      position: 'absolute',
-      width: 210,
-      height: 210,
-      background: theme.palette.secondary[800],
-      borderRadius: '50%',
-      top: -85,
-      right: -95,
-      [theme.breakpoints.down('sm')]: {
-          top: -105,
-          right: -140
-      }
-  },
-  '&:before': {
-      content: '""',
-      position: 'absolute',
-      width: 210,
-      height: 210,
-      background: theme.palette.secondary[800],
-      borderRadius: '50%',
-      top: -125,
-      right: -15,
-      opacity: 0.5,
-      [theme.breakpoints.down('sm')]: {
-          top: -155,
-          right: -70
-      }
-  }
-}));
-
-
-
-const SignalsCard = ( {featuredStrategies}) => {
+const StrategiesCard = ( {featuredStrategies}) => {
   const theme = useTheme();
   const columns = useMemo(
     () => [
@@ -124,12 +84,12 @@ const SignalsCard = ( {featuredStrategies}) => {
       {
         accessorKey: 'period',
         header: 'Period',
-        size: 80,
+        size: 70,
       },
       {
         accessorKey: 'latestTrade',
         header: 'Latest trade',
-        size: 30,
+        size: 50,
       }, 
       {
         accessorKey: 'numberOfTicks',
@@ -175,21 +135,6 @@ const SignalsCard = ( {featuredStrategies}) => {
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      // if (isDesktop) {
-      //   setColumnPinning({
-      //     left: ['mrt-row-expand', 'mrt-row-numbers', 'columnInstanceAPI'],
-      //     right: ['link'],
-      //   });
-      // } else {
-      //   setColumnPinning({});
-      // }
-    }
-  }, [isDesktop]);
-
-
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
       setIsLoading(false);
     }
     getStrategies();
@@ -232,7 +177,6 @@ const SignalsCard = ( {featuredStrategies}) => {
       });
   }
 
-
   //https://ultimatecourses.com/blog/navigate-to-url-query-strings-search-params-react-router
   const useNavigateSearch = () => {
     const navigate = useNavigate();
@@ -240,10 +184,14 @@ const SignalsCard = ( {featuredStrategies}) => {
       navigate({ pathname, search: `?${createSearchParams(params)}` });
   };
   const navigateSearch = useNavigateSearch();
+
   const goToStrategy = () => {
     navigateSearch('/strategy-page', { sort: 'date', order: 'newest' });
   }
 
+  const goToCoinbase = (securityName) => {
+    window.open('https://www.coinbase.com/advanced-trade/'+securityName, '_blank');
+  }
 
   return (
     <>
@@ -254,18 +202,7 @@ const SignalsCard = ( {featuredStrategies}) => {
                   <MaterialReactTable
                     columns={columns}
                     data={featuredStrategies}
-                    displayColumnDefOptions={{
-                      'mrt-row-numbers': {
-                        size: 10,
-                      },
-                      'mrt-row-expand': {
-                        size: 10,
-                      },
-                    }}                    
                     enableColumnFilterModes
-                    enablePinning
-                    positionToolbarAlertBanner="bottom"
-                    enableBottomToolbar={false}
                     enableGlobalFilterModes
                     enablePagination={false}
                     enableRowVirtualization
@@ -274,10 +211,11 @@ const SignalsCard = ( {featuredStrategies}) => {
                                     density: 'compact', 
                                     showColumnFilters: true ,
                                   }}
+                    enableExpandAll={false}                              
                     renderDetailPanel={({ row }) => (
                       <Grid container spacing={gridSpacing}>
                         <Grid item xs={12}>  
-                          { row.original.securityName ? <Container featuredStrategy={row.original} securityName={row.original.securityName} strategies={strategies} initStrategy={row.original.name}/>: null}    
+                          { row.getIsExpanded() ? <Container featuredStrategy={row.original} securityName={row.original.securityName} strategies={strategies} initStrategy={row.original.name}/>: null}    
                         </Grid>
                         <Grid item xs={12}>  
                           <Typography variant="h5">Trades {row.original.name} | {row.original.securityName} </Typography>
@@ -294,12 +232,9 @@ const SignalsCard = ( {featuredStrategies}) => {
                         </Grid>
                       </Grid>
                     )}   
-                    renderRowActionMenuItems={({ closeMenu, row }) => [
+                    renderRowActionMenuItems={({ row }) => [
                       <MenuItem
                         key={0}
-                        // onClick={() => {
-                        //   closeMenu();
-                        // }}
                         onClick={goToStrategy}                        
                         sx={{ m: 0 }}
                       >
@@ -311,9 +246,8 @@ const SignalsCard = ( {featuredStrategies}) => {
                       <MenuItem
                         key={1}
                         onClick={() => {
-                          // Send email logic...
-                          closeMenu();
-                        }}
+                          goToCoinbase(row.original.securityName);
+                         }}
                         sx={{ m: 0 }}
                       >
                         <ListItemIcon>
@@ -325,7 +259,6 @@ const SignalsCard = ( {featuredStrategies}) => {
                     onSortingChange={setSorting}
                     state={{ isLoading, sorting, columnPinning }}
                     rowNumberMode="static"
-                    //onColumnPinningChange={setColumnPinning}
                     virtualizerInstanceRef={virtualizerInstanceRef} //optional
                     virtualizerProps={{ overscan: 20 }} //optionally customize the virtualizer
                   />
@@ -338,4 +271,4 @@ const SignalsCard = ( {featuredStrategies}) => {
   );
 };
 
-export default SignalsCard;
+export default StrategiesCard;

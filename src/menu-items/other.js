@@ -19,6 +19,14 @@ const other = {
         //     breadcrumbs: false
         // },
         {
+            id: 'strategies-page',
+            title: 'Strategies',
+            type: 'item',
+            url: '/strategies-page',
+            icon: icons.IconRocket,
+            breadcrumbs: false
+        },
+        {
             id: 'frosk-page',
             title: 'Securities',
             type: 'item',
@@ -26,17 +34,6 @@ const other = {
             icon: icons.IconHandRock,
             breadcrumbs: false
         },
-        {
-            id: 'signal-page',
-            title: 'Strategies',
-            type: 'item',
-            url: '/signal-page',
-            icon: icons.IconRocket,
-            breadcrumbs: false
-        },
-        
-        
-
         // {
         //     id: 'documentation',
         //     title: 'Documentation',

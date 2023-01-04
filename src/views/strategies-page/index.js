@@ -6,10 +6,10 @@ import { Typography, Grid } from '@mui/material';
 
 // project imports
 import { gridSpacing } from 'store/constant';
-import SignalsCard from './SignalsCard';
+import StrategiesCard from './StrategiesCard';
 import config from 'config';
 
-const SignalPage = () => {
+const StrategiesPage = () => {
     const [isLoading, setLoading] = useState(true);
     const [longtrades, setLongtrades] = useState([]);
     const [featuredStrategies, setFeaturedStrategies] = useState([]);
@@ -23,7 +23,6 @@ const SignalPage = () => {
             (response) => {
                 setIsLoaded(true);
                 setLoading(false);
-                console.log('featuredStrategies',featuredStrategies)
                 setFeaturedStrategies(response);
             },
             (error) => {
@@ -39,11 +38,11 @@ const SignalPage = () => {
         <Grid item>
             <Grid container spacing={gridSpacing}>
                 <Grid item>
-                    {featuredStrategies ? <SignalsCard featuredStrategies={featuredStrategies}></SignalsCard>: null}
+                    {featuredStrategies ? <StrategiesCard featuredStrategies={featuredStrategies}></StrategiesCard>: null}
                 </Grid>
             </Grid>
         </Grid>
     );
 };
 
-export default SignalPage;
+export default StrategiesPage;

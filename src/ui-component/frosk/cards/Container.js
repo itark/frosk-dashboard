@@ -5,7 +5,6 @@ import React, {
 	useCallback,
 	useContext,
 	useEffect,
-	useMemo,
 	useImperativeHandle,
 	useLayoutEffect,
 	useRef,
@@ -33,6 +32,7 @@ export const Container = (props) => {
 	const [strategy, setStrategy] = useState(initStrategy);
     const blue = '#2962FF';
 	const orange = '#e69138';
+	const red = '#be4d25';
 	const [chartLayoutOptions, setChartLayoutOptions] = useState({});
 	const markers = [];
 	const candleSeries = useRef(null);
@@ -44,19 +44,19 @@ export const Container = (props) => {
 	const pSarSeries = useRef(null);
 	const macdSeries = useRef(null);
 	const emaMacdSeries = useRef(null);
+	const adxSeries = useRef(null);
+	const plusDISeries = useRef(null);
+	const minusDISeries = useRef(null);
+	const longCciSeries = useRef(null);
+	const shortCciSeries = useRef(null);
 	const strategyEnabled = initStrategy === undefined ? false : true;
 
 	useEffect(() => {
 		getSecurityData();
-		if (strategy) {
-			getFeaturedStrategy();
-		}
 	}, [securityName]);
 
 	useEffect(() => {
-		if (strategy) {
-			getFeaturedStrategy();
-		}
+
 		getFeaturedStrategy();
 	}, [strategy]);
 
@@ -78,6 +78,11 @@ export const Container = (props) => {
 			setParabolicSar(response);
 			setMacd(response);
 			setEmaMacd(response);
+			setAdx(response);
+			setPlusDI(response);
+			setMinusDI(response);
+			setLongCci(response);				
+			setShortCci(response);	
 
 			setMarkers(response);
 		  });
@@ -91,6 +96,7 @@ export const Container = (props) => {
 				value: datapoint.value,
 				name: datapoint.name
 		}));
+		if (shortEma) console.log('shortEma values',shortEma.length)
 		shortEmaSeries.current.setData(shortEma);
 	}
 
@@ -102,6 +108,7 @@ export const Container = (props) => {
 				value: datapoint.value,
 				name: datapoint.name
 		}));
+		if (longEma) console.log('longEma values',longEma.length)
 		longEmaSeries.current.setData(longEma);
 	}
 
@@ -113,6 +120,7 @@ export const Container = (props) => {
 				value: datapoint.value,
 				name: datapoint.name
 		}));
+		if (pSar) console.log('pSar values',pSar.length)
 		pSarSeries.current.setData(pSar);
 	}
 
@@ -124,6 +132,7 @@ export const Container = (props) => {
 				value: datapoint.value,
 				name: datapoint.name
 		}));
+		if (macd) console.log('macd values',macd.length)		
 		macdSeries.current.setData(macd);
 	}	
 
@@ -135,7 +144,68 @@ export const Container = (props) => {
 				value: datapoint.value,
 				name: datapoint.name
 		}));
+		if (emaMacd) console.log('emaMacd values',emaMacd.length)	
 		emaMacdSeries.current.setData(emaMacd);
+	}	
+
+	const setAdx =  (response) => {
+		const adx = response.indicatorValues
+			.filter(o => o.name === 'adx')
+			.map(datapoint => ({
+				time: datapoint.time,
+				value: datapoint.value,
+				name: datapoint.name
+		}));
+		if (adx) console.log('adx values',adx.length)	
+		adxSeries.current.setData(adx);
+	}
+
+	const setPlusDI =  (response) => {
+		const plusDI = response.indicatorValues
+			.filter(o => o.name === 'plusDI')
+			.map(datapoint => ({
+				time: datapoint.time,
+				value: datapoint.value,
+				name: datapoint.name
+		}));
+		if (plusDI) console.log('plusDI values',plusDI.length)	
+		plusDISeries.current.setData(plusDI);
+	}
+
+	const setMinusDI =  (response) => {
+		const minusDI = response.indicatorValues
+			.filter(o => o.name === 'minusDI')
+			.map(datapoint => ({
+				time: datapoint.time,
+				value: datapoint.value,
+				name: datapoint.name
+		}));
+		if (minusDI) console.log('minusDI values',minusDI.length)	
+		minusDISeries.current.setData(minusDI);
+	}	
+
+	const setLongCci =  (response) => {
+		const longCci = response.indicatorValues
+			.filter(o => o.name === 'longCci')
+			.map(datapoint => ({
+				time: datapoint.time,
+				value: datapoint.value,
+				name: datapoint.name
+		}));
+		if (longCci) console.log('longCci values',longCci.length)	
+		longCciSeries.current.setData(longCci);
+	}	
+
+	const setShortCci =  (response) => {
+		const shortCci = response.indicatorValues
+			.filter(o => o.name === 'shortCci')
+			.map(datapoint => ({
+				time: datapoint.time,
+				value: datapoint.value,
+				name: datapoint.name
+		}));
+		if (shortCci) console.log('shortCci values',shortCci.length)	
+		shortCciSeries.current.setData(shortCci);
 	}	
 
 	const setMarkers =  (response) => {
@@ -155,7 +225,7 @@ export const Container = (props) => {
 					position: 'aboveBar',
 					color: '#e91e63',
 					shape: 'arrowDown',
-					text: 'Sell ' + Math.floor(trades[i].price),
+					text: 'Sell ' + trades[i].price,
 				});
 			} else if (trades[i].type === 'BUY') {
 				markers.push({
@@ -163,12 +233,14 @@ export const Container = (props) => {
 					position: 'belowBar',
 					color: '#2196F3',
 					shape: 'arrowUp',
-					text: 'Buy ' + Math.floor(trades[i].price),
+					text: 'Buy ' + trades[i].price,
 				});
 			} else {
 				console.error('trades[i].type',trades[i].type)
 			}
 		}
+		if (markers) console.log('markers values',markers.length)
+		if (markers) console.log('response.trades',response.trades)				
 		candleSeries.current.setMarkers(markers);
 	}
 
@@ -251,7 +323,32 @@ export const Container = (props) => {
 									type={'emaMacd'}
 									ref={emaMacdSeries}
 									color={theme.palette.orange.dark}
-								/>									
+								/>	
+								<Line
+									type={'adx'}
+									ref={adxSeries}
+									color={red}
+								/>
+								<Line
+									type={'plusDI'}
+									ref={plusDISeries}
+									color={blue}
+								/>
+								<Line
+									type={'minusDI'}
+									ref={minusDISeries}
+									color={theme.palette.orange.dark}
+								/>
+								<Line
+									type={'longCci'}
+									ref={longCciSeries}
+									color={red}
+								/>
+								<Line
+									type={'shortCci'}
+									ref={shortCciSeries}
+									color={blue}
+								/>
 							</Chart>
                         </Grid>
                     </Grid>
@@ -272,7 +369,7 @@ export function Chart(props) {
 
 export const ChartContainer = forwardRef((props, ref) => {
 	const { children, container, layout, ...rest } = props;
-	const { securityName} = props;
+	const { securityName } = props;
 	const chartApiRef = useRef({
 		api() {
 			if (!this._api) {
@@ -368,6 +465,11 @@ export const Candles = forwardRef((props, ref) => {
 					borderUpColor: '#4bffb5',
 					wickDownColor: '#838ca1',
 					wickUpColor: '#838ca1',
+					priceFormat: {
+						type: 'close',
+						precision: 6,
+						minMove: 0.00001,
+					}
 					});
 			}
 			return this._candles;
@@ -389,6 +491,28 @@ export const Candles = forwardRef((props, ref) => {
 		const currentRef = context.current;
 		const { children, ...rest } = props;
 		currentRef.candles().applyOptions(rest);
+		//const container = document.getElementById('container');
+		const container = parent.api();
+
+		const legend = document.createElement('div');
+		legend.style = `position: absolute; left: 12px; top: 12px; z-index: 1; font-size: 14px; font-family: sans-serif; line-height: 18px; font-weight: 300;`;
+		legend.style.color = 'black';
+		//container.appendChild(legend);
+
+		parent.api().subscribeCrosshairMove(param => {
+			let close = '';
+			if (param.time) {
+				const price = param.seriesPrices.get(currentRef.candles());
+				close = price.close;
+				//console.log('(close',close);
+			}
+			// legend is a html element which has already been created
+			//legend.innerHTML = `${securityName} <strong>${close}</strong>`;
+			legend.innerHTML = `<strong>${close}</strong>`;
+		});
+
+
+
 	});
 
 	useImperativeHandle(ref, 
@@ -439,8 +563,8 @@ export const Line = forwardRef((props, ref) => {
 		currentRef.line().applyOptions({
 			priceFormat: {
 				type: 'value',
-				precision: 2,
-				minMove: 0.01,
+				precision: 6,
+				minMove: 0.00001,
 			},
 		});
 	});

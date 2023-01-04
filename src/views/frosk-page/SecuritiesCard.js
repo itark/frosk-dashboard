@@ -108,6 +108,7 @@ const SecuritiesCard = ( {securities}) => {
                   <MaterialReactTable
                     muiTableBodyRowProps={({ row }) => ({
                       onClick: (event) => {
+                        row.getToggleSelectedHandler();
                         setSecurity(row.original.name);
                       },
                       sx: {
