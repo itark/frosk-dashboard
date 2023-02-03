@@ -23,13 +23,16 @@ import MainCard from 'ui-component/cards/MainCard';
 import { gridSpacing } from 'store/constant';
 import '../../frosk/styles.css';
 import config from 'config';
+import { ConsoleView } from 'react-device-detect';
 
 const Context = createContext();
 
 export const Container = (props) => {
 	const theme = useTheme();
-	const { securityName, strategies, initStrategy, featuredStrategy} = props;
-	const [strategy, setStrategy] = useState(initStrategy);
+	const { securityName, initSelectedStrategy, initFeaturedStrategy, disableStrategySelect} = props;
+	const [selectedStrategy, setSelectedStrategy] = useState(initSelectedStrategy);
+	const [featuredStrategy, setFeaturedStrategy] = useState(initFeaturedStrategy);
+	const [strategies, setStrategies] = useState();
     const blue = '#2962FF';
 	const orange = '#e69138';
 	const red = '#be4d25';
@@ -49,16 +52,35 @@ export const Container = (props) => {
 	const minusDISeries = useRef(null);
 	const longCciSeries = useRef(null);
 	const shortCciSeries = useRef(null);
-	const strategyEnabled = initStrategy === undefined ? false : true;
+
+	useEffect(() => {
+		getStrategies();
+		setSelectedStrategy(initSelectedStrategy);
+	}, [initSelectedStrategy]);
 
 	useEffect(() => {
 		getSecurityData();
 	}, [securityName]);
 
 	useEffect(() => {
-
 		getFeaturedStrategy();
-	}, [strategy]);
+	}, [selectedStrategy]);
+
+	const getStrategies = () => {
+		const strats = [];
+		fetch(config.baseApi+"/strategies")
+		  .then((response) => response.json())
+		  .then((response) => {
+			for (let i = 0; i < response.length; i++) {
+			  strats.push(  {
+				value: response[i],
+				label: response[i]
+			  })
+			}
+			setStrategies(strats);
+		  });
+	  }
+
 
 	const getSecurityData =  () => {
 		fetch(config.baseApi+"/prices?security="+securityName)
@@ -70,7 +92,7 @@ export const Container = (props) => {
 	  };
 
 	const getFeaturedStrategy =  () => {
-		fetch(config.baseApi+"/featuredStrategy?security="+securityName+"&strategy="+strategy)
+		fetch(config.baseApi+"/featuredStrategy?security="+securityName+"&strategy="+selectedStrategy)
 		  .then((response) => response.json())
 		  .then((response) => {
 			setShortEma(response);
@@ -85,6 +107,7 @@ export const Container = (props) => {
 			setShortCci(response);	
 
 			setMarkers(response);
+			setFeaturedStrategy(response);
 		  });
 	}
 
@@ -96,7 +119,7 @@ export const Container = (props) => {
 				value: datapoint.value,
 				name: datapoint.name
 		}));
-		if (shortEma) console.log('shortEma values',shortEma.length)
+		//if (shortEma) console.log('shortEma values',shortEma.length)
 		shortEmaSeries.current.setData(shortEma);
 	}
 
@@ -108,7 +131,7 @@ export const Container = (props) => {
 				value: datapoint.value,
 				name: datapoint.name
 		}));
-		if (longEma) console.log('longEma values',longEma.length)
+		//if (longEma) console.log('longEma values',longEma.length)
 		longEmaSeries.current.setData(longEma);
 	}
 
@@ -120,7 +143,7 @@ export const Container = (props) => {
 				value: datapoint.value,
 				name: datapoint.name
 		}));
-		if (pSar) console.log('pSar values',pSar.length)
+		//if (pSar) console.log('pSar values',pSar.length)
 		pSarSeries.current.setData(pSar);
 	}
 
@@ -132,7 +155,7 @@ export const Container = (props) => {
 				value: datapoint.value,
 				name: datapoint.name
 		}));
-		if (macd) console.log('macd values',macd.length)		
+		//if (macd) console.log('macd values',macd.length)		
 		macdSeries.current.setData(macd);
 	}	
 
@@ -144,7 +167,7 @@ export const Container = (props) => {
 				value: datapoint.value,
 				name: datapoint.name
 		}));
-		if (emaMacd) console.log('emaMacd values',emaMacd.length)	
+		//if (emaMacd) console.log('emaMacd values',emaMacd.length)	
 		emaMacdSeries.current.setData(emaMacd);
 	}	
 
@@ -156,7 +179,7 @@ export const Container = (props) => {
 				value: datapoint.value,
 				name: datapoint.name
 		}));
-		if (adx) console.log('adx values',adx.length)	
+		//if (adx) console.log('adx values',adx.length)	
 		adxSeries.current.setData(adx);
 	}
 
@@ -168,7 +191,7 @@ export const Container = (props) => {
 				value: datapoint.value,
 				name: datapoint.name
 		}));
-		if (plusDI) console.log('plusDI values',plusDI.length)	
+		//if (plusDI) console.log('plusDI values',plusDI.length)	
 		plusDISeries.current.setData(plusDI);
 	}
 
@@ -180,7 +203,7 @@ export const Container = (props) => {
 				value: datapoint.value,
 				name: datapoint.name
 		}));
-		if (minusDI) console.log('minusDI values',minusDI.length)	
+		//if (minusDI) console.log('minusDI values',minusDI.length)	
 		minusDISeries.current.setData(minusDI);
 	}	
 
@@ -192,7 +215,7 @@ export const Container = (props) => {
 				value: datapoint.value,
 				name: datapoint.name
 		}));
-		if (longCci) console.log('longCci values',longCci.length)	
+		//if (longCci) console.log('longCci values',longCci.length)	
 		longCciSeries.current.setData(longCci);
 	}	
 
@@ -204,7 +227,7 @@ export const Container = (props) => {
 				value: datapoint.value,
 				name: datapoint.name
 		}));
-		if (shortCci) console.log('shortCci values',shortCci.length)	
+		//if (shortCci) console.log('shortCci values',shortCci.length)	
 		shortCciSeries.current.setData(shortCci);
 	}	
 
@@ -239,8 +262,8 @@ export const Container = (props) => {
 				console.error('trades[i].type',trades[i].type)
 			}
 		}
-		if (markers) console.log('markers values',markers.length)
-		if (markers) console.log('response.trades',response.trades)				
+		//if (markers) console.log('markers values',markers.length)
+		//if (markers) console.log('response.trades',response.trades)				
 		candleSeries.current.setMarkers(markers);
 	}
 
@@ -261,19 +284,19 @@ export const Container = (props) => {
                                     </Grid> : null}
                                 </Grid>
                                 <Grid item>
-                                    <TextField
+                                 <TextField
                                         id="strategies-select"
                                         select
-                                        value={strategy}
-                                        onChange={(e) => setStrategy(e.target.value)}
-										disabled={strategyEnabled}
+                                        value={selectedStrategy}
+                                        onChange={(e) => setSelectedStrategy(e.target.value)}
+										disabled={disableStrategySelect}
                                     >
-                                        {strategies.map((option) => (
+                                        {strategies ?  strategies.map((option) => (
                                             <MenuItem key={option.value} value={option.value}>
                                                 {option.label}
                                             </MenuItem>
-                                        ))}
-                                    </TextField>
+                                        )): null}
+                                    </TextField> 
                                 </Grid>
                             </Grid>
                         </Grid>
@@ -351,6 +374,12 @@ export const Container = (props) => {
 								/>
 							</Chart>
                         </Grid>
+
+
+
+
+
+						
                     </Grid>
                 </MainCard>
 		</>

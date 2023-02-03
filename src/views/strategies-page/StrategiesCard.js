@@ -1,4 +1,4 @@
-import { Link, useNavigate, createSearchParams } from 'react-router-dom';
+import { Link, useNavigate, createSearchParams, Route } from 'react-router-dom';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import MaterialReactTable from 'material-react-table';
 import {
@@ -177,19 +177,21 @@ const StrategiesCard = ( {featuredStrategies}) => {
       });
   }
 
-  //https://ultimatecourses.com/blog/navigate-to-url-query-strings-search-params-react-router
-  const useNavigateSearch = () => {
+  const useNavigateParam = () => {
     const navigate = useNavigate();
-    return (pathname, params) =>
-      navigate({ pathname, search: `?${createSearchParams(params)}` });
+    return (pathname, id) =>
+      navigate({ pathname, id}, {
+        state: id
+      });
   };
-  const navigateSearch = useNavigateSearch();
+  const navigateParam = useNavigateParam();
 
-  const goToStrategy = () => {
-    navigateSearch('/strategy-page', { sort: 'date', order: 'newest' });
+
+  const openStrategy = (row) => {
+    navigateParam('/container-page', row);
   }
 
-  const goToCoinbase = (securityName) => {
+  const openCoinbase = (securityName) => {
     window.open('https://www.coinbase.com/advanced-trade/'+securityName, '_blank');
   }
 
@@ -215,7 +217,7 @@ const StrategiesCard = ( {featuredStrategies}) => {
                     renderDetailPanel={({ row }) => (
                       <Grid container spacing={gridSpacing}>
                         <Grid item xs={12}>  
-                          { row.getIsExpanded() ? <Container featuredStrategy={row.original} securityName={row.original.securityName} strategies={strategies} initStrategy={row.original.name}/>: null}    
+                          { row.getIsExpanded() ? <Container initFeaturedStrategy={row.original} securityName={row.original.securityName} initSelectedStrategy={row.original.name} disableStrategySelect={true}/>: null}    
                         </Grid>
                         <Grid item xs={12}>  
                           <Typography variant="h5">Trades {row.original.name} | {row.original.securityName} </Typography>
@@ -235,7 +237,10 @@ const StrategiesCard = ( {featuredStrategies}) => {
                     renderRowActionMenuItems={({ row }) => [
                       <MenuItem
                         key={0}
-                        onClick={goToStrategy}                        
+                        //onClick={openStrategy}     
+                        onClick={() => {
+                          openStrategy(row.original);
+                        }}             
                         sx={{ m: 0 }}
                       >
                         <ListItemIcon>
@@ -246,7 +251,7 @@ const StrategiesCard = ( {featuredStrategies}) => {
                       <MenuItem
                         key={1}
                         onClick={() => {
-                          goToCoinbase(row.original.securityName);
+                          openCoinbase(row.original.securityName);
                          }}
                         sx={{ m: 0 }}
                       >

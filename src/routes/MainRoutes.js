@@ -14,9 +14,10 @@ const UtilsShadow = Loadable(lazy(() => import('views/utilities/Shadow')));
 const UtilsMaterialIcons = Loadable(lazy(() => import('views/utilities/MaterialIcons')));
 const UtilsTablerIcons = Loadable(lazy(() => import('views/utilities/TablerIcons')));
 
-// sample page routing
+// page routing
 const FroskPage = Loadable(lazy(() => import('views/frosk-page')));
 const StrategiesPage = Loadable(lazy(() => import('views/strategies-page')));
+const ContainerPage = Loadable(lazy(() => import('views/container-page')));
 
 // ==============================|| MAIN ROUTING ||============================== //
 
@@ -81,6 +82,10 @@ const MainRoutes = {
                     element: <UtilsMaterialIcons />
                 }
             ]
+        },
+        {
+            path: 'container-page',
+            element: <ContainerPage />
         },
         {
             path: 'frosk-page',

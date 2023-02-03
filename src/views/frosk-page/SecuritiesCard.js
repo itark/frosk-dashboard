@@ -3,6 +3,7 @@ import MaterialReactTable from 'material-react-table';
 import {
   CardContent,
   Grid,
+  Typography
 } from '@mui/material';
 
 import MainCard from 'ui-component/cards/MainCard';
@@ -69,6 +70,8 @@ const SecuritiesCard = ( {securities}) => {
   const [sorting, setSorting] = useState([]);
   const [security, setSecurity] = useState();
   const [strategies, setStrategies] = useState();
+  const [featuredStrategy, setFeaturedStrategy] = useState();
+  const [initSelectedStrategy, setInitSelectedStrategy] = useState();
   
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -110,6 +113,7 @@ const SecuritiesCard = ( {securities}) => {
                       onClick: (event) => {
                         row.getToggleSelectedHandler();
                         setSecurity(row.original.name);
+                        setInitSelectedStrategy(row.original.bestStrategy)
                       },
                       sx: {
                         cursor: 'pointer', //you might want to change the cursor too when adding an onClick
@@ -139,7 +143,7 @@ const SecuritiesCard = ( {securities}) => {
                   />
                 </Grid>
                 <Grid item xs={10} sx={{ pt: '16px !important' }}>
-                  { security ? <Container securityName={security} strategies={strategies}/>: null}    
+                  { security ? <Container securityName={security} initSelectedStrategy={initSelectedStrategy}/>: null}    
                 </Grid>
             </Grid>
           </CardContent>
