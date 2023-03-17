@@ -69,38 +69,19 @@ const SecuritiesCard = ( {securities}) => {
   const [isLoading, setIsLoading] = useState(true);
   const [sorting, setSorting] = useState([]);
   const [security, setSecurity] = useState();
-  const [strategies, setStrategies] = useState();
-  const [featuredStrategy, setFeaturedStrategy] = useState();
   const [initSelectedStrategy, setInitSelectedStrategy] = useState();
   
   useEffect(() => {
     if (typeof window !== 'undefined') {
       setIsLoading(false);
     }
-    getStrategies();
   }, []);
 
   useEffect(() => {
     if (virtualizerInstanceRef.current) {
-      //scroll to the top of the table when the sorting changes
       virtualizerInstanceRef.current.scrollToIndex(0);
     }
   }, [sorting]);
-
-  const getStrategies = () => {
-    const strats = [];
-    fetch(config.baseApi+"/strategies")
-      .then((response) => response.json())
-      .then((response) => {
-        for (let i = 0; i < response.length; i++) {
-          strats.push(  {
-            value: response[i],
-            label: response[i]
-          })
-        }
-        setStrategies(strats);
-      });
-  }
 
   return (
     <>
@@ -111,13 +92,15 @@ const SecuritiesCard = ( {securities}) => {
                   <MaterialReactTable
                     muiTableBodyRowProps={({ row }) => ({
                       onClick: (event) => {
-                        row.getToggleSelectedHandler();
                         setSecurity(row.original.name);
                         setInitSelectedStrategy(row.original.bestStrategy)
                       },
                       sx: {
                         cursor: 'pointer', //you might want to change the cursor too when adding an onClick
                       },
+                      onLoad: (event) => {
+                        console.log('onLoad'); //Not working
+                      }
                     })}
                     columns={columns}
                     data={securities}
@@ -143,7 +126,7 @@ const SecuritiesCard = ( {securities}) => {
                   />
                 </Grid>
                 <Grid item xs={10} sx={{ pt: '16px !important' }}>
-                  { security ? <Container securityName={security} initSelectedStrategy={initSelectedStrategy}/>: null}    
+                  { security ? <Container securityName={security} initSelectedStrategy={initSelectedStrategy}  disableStrategySelect={false}/>: null}    
                 </Grid>
             </Grid>
           </CardContent>

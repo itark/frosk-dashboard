@@ -1,4 +1,4 @@
-import { Link, useNavigate, createSearchParams, Route } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import MaterialReactTable from 'material-react-table';
 import {
@@ -12,7 +12,6 @@ import {
 } from '@mui/material';
 
 import { AccountCircle, Send } from '@mui/icons-material';
-
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Collapse from '@mui/material/Collapse';
 import IconButton from '@mui/material/IconButton';
@@ -21,7 +20,7 @@ import ReactImageFallback from "react-image-fallback";
 
 import MainCard from 'ui-component/cards/MainCard';
 import { Container } from '../../ui-component/frosk/cards/Container';
-import { TradesTable } from '../../ui-component/frosk/TradesTable';
+import { TradesTable } from '../../ui-component/frosk/cards/TradesTable';
 import ColumnBox from '../../ui-component/frosk/ColumnBox';
 import { useTheme } from '@mui/material/styles';
 
@@ -217,20 +216,7 @@ const StrategiesCard = ( {featuredStrategies}) => {
                     renderDetailPanel={({ row }) => (
                       <Grid container spacing={gridSpacing}>
                         <Grid item xs={12}>  
-                          { row.getIsExpanded() ? <Container initFeaturedStrategy={row.original} securityName={row.original.securityName} initSelectedStrategy={row.original.name} disableStrategySelect={true}/>: null}    
-                        </Grid>
-                        <Grid item xs={12}>  
-                          <Typography variant="h5">Trades {row.original.name} | {row.original.securityName} </Typography>
-                          <ExpandMore
-                              expand={expanded}
-                              onClick={handleExpandClick}
-                              aria-expanded={expanded}
-                              aria-label="show more">
-                            <ExpandMoreIcon />
-                          </ExpandMore>
-                            <Collapse in={expanded} timeout="auto" unmountOnExit>
-                              {row.original.trades ? <TradesTable trades={row.original.trades} />:null }
-                            </Collapse>   
+                          { row.getIsExpanded() ? <Container securityName={row.original.securityName} initSelectedStrategy={row.original.name+'Strategy'} disableStrategySelect={true}/>: null}    
                         </Grid>
                       </Grid>
                     )}   

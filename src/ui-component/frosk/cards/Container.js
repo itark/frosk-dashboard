@@ -16,23 +16,28 @@ import {
 	TextField,
 	MenuItem,
 	Grid,
-	Typography
+	Typography,
+	Collapse,
+	IconButton
   } from '@mui/material';
 
+import { styled } from '@mui/material/styles';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import MainCard from 'ui-component/cards/MainCard';
+import TradesTable from './TradesTable';
 import { gridSpacing } from 'store/constant';
 import '../../frosk/styles.css';
 import config from 'config';
-import { ConsoleView } from 'react-device-detect';
 
 const Context = createContext();
 
 export const Container = (props) => {
 	const theme = useTheme();
-	const { securityName, initSelectedStrategy, initFeaturedStrategy, disableStrategySelect} = props;
+	const { securityName, initSelectedStrategy, disableStrategySelect} = props;
 	const [selectedStrategy, setSelectedStrategy] = useState(initSelectedStrategy);
-	const [featuredStrategy, setFeaturedStrategy] = useState(initFeaturedStrategy);
+	const [featuredStrategy, setFeaturedStrategy] = useState();
 	const [strategies, setStrategies] = useState();
+	const [expanded, setExpanded] = useState(false);
     const blue = '#2962FF';
 	const orange = '#e69138';
 	const red = '#be4d25';
@@ -45,6 +50,7 @@ export const Container = (props) => {
 	const shortSmaSeries = useRef(null);
 	const longSmaSeries = useRef(null);
 	const pSarSeries = useRef(null);
+	const celSeries = useRef(null);
 	const macdSeries = useRef(null);
 	const emaMacdSeries = useRef(null);
 	const adxSeries = useRef(null);
@@ -56,6 +62,8 @@ export const Container = (props) => {
 	useEffect(() => {
 		getStrategies();
 		setSelectedStrategy(initSelectedStrategy);
+		getFeaturedStrategy();
+
 	}, [initSelectedStrategy]);
 
 	useEffect(() => {
@@ -65,6 +73,21 @@ export const Container = (props) => {
 	useEffect(() => {
 		getFeaturedStrategy();
 	}, [selectedStrategy]);
+
+	const handleExpandClick = () => {
+		setExpanded(!expanded);
+	};  
+
+	const ExpandMore = styled((props) => {
+		const { expand, ...other } = props;
+		return <IconButton {...other} />;
+	  })(({ theme, expand }) => ({
+		transform: !expand ? 'rotate(0deg)' : 'rotate(180deg)',
+		marginLeft: 'auto',
+		transition: theme.transitions.create('transform', {
+		  duration: theme.transitions.duration.shortest,
+		}),
+	  }));
 
 	const getStrategies = () => {
 		const strats = [];
@@ -95,9 +118,11 @@ export const Container = (props) => {
 		fetch(config.baseApi+"/featuredStrategy?security="+securityName+"&strategy="+selectedStrategy)
 		  .then((response) => response.json())
 		  .then((response) => {
+			console.log('response',response)
 			setShortEma(response);
 			setLongEma(response);
 			setParabolicSar(response);
+			setCel(response);
 			setMacd(response);
 			setEmaMacd(response);
 			setAdx(response);
@@ -145,6 +170,18 @@ export const Container = (props) => {
 		}));
 		//if (pSar) console.log('pSar values',pSar.length)
 		pSarSeries.current.setData(pSar);
+	}
+
+	const setCel =  (response) => {
+		const cel = response.indicatorValues
+			.filter(o => o.name === 'cel')
+			.map(datapoint => ({
+				time: datapoint.time,
+				value: datapoint.value,
+				name: datapoint.name
+		}));
+		if (cel) console.log('cel values',cel.length)
+		celSeries.current.setData(cel);
 	}
 
 	const setMacd =  (response) => {
@@ -270,7 +307,7 @@ export const Container = (props) => {
 	return (
 		<>
 			<MainCard>
-                    <Grid container spacing={gridSpacing}>
+		 		<Grid container spacing={gridSpacing}>
                         <Grid item xs={12}>
                             <Grid container alignItems="center" justifyContent="space-between">
                                 <Grid item>
@@ -336,6 +373,11 @@ export const Container = (props) => {
 									type={'pSar'}
 									ref={pSarSeries}
 									color={orange}
+								/>	
+								<Line
+									type={'cel'}
+									ref={celSeries}
+									color={orange}
 								/>		
 								<Line
 									type={'macd'}
@@ -375,11 +417,20 @@ export const Container = (props) => {
 							</Chart>
                         </Grid>
 
+                        {featuredStrategy ? <Grid item xs={12}>  
+                          <Typography variant="h5">Trades {featuredStrategy.name} | {featuredStrategy.securityName} </Typography>
+                          <ExpandMore
+                              expand={expanded}
+                              onClick={handleExpandClick}
+                              aria-expanded={expanded}
+                              aria-label="show more">
+                            <ExpandMoreIcon />
+                          </ExpandMore>
+                            <Collapse in={expanded} timeout="auto" unmountOnExit>
+                              {featuredStrategy.trades ? <TradesTable trades={featuredStrategy.trades} />:null }
+                            </Collapse>   
+                        </Grid>: null}
 
-
-
-
-						
                     </Grid>
                 </MainCard>
 		</>
@@ -559,16 +610,20 @@ Candles.displayName = 'Candles';
 
 export const Line = forwardRef((props, ref) => {
 	const parent = useContext(Context);
+	let lineStyle = 0; //https://tradingview.github.io/lightweight-charts/docs/api/interfaces/LineStyleOptions
 	const contextLine = useRef({
 		line() {
 			if (!this._line) {
 				const { children, type, color, ...rest } = props;
-				this._line = parent.api().addLineSeries({
+				if (type === 'cel') {
+					lineStyle = 2;
+				}
+				this._line = parent.api().addLineSeries({ 
 					color: color,
-					lineWidth: 1,
-					lastValueVisible: false,
-					priceLineVisible: false,
-					type: 'solid'
+					lineWidth: 2,
+					lineStyle: lineStyle, 
+					lastValueVisible: true,
+					priceLineVisible: true,
 				});
 			}
 			return this._line;

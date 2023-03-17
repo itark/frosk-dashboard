@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import MaterialReactTable from 'material-react-table';
-import ColumnBox from '../../ui-component/frosk/ColumnBox';
+import ColumnBox from '../ColumnBox';
 
 export const TradesTable = ({trades}) => {
 
