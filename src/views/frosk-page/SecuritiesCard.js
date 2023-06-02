@@ -3,14 +3,12 @@ import MaterialReactTable from 'material-react-table';
 import {
   CardContent,
   Grid,
-  Typography
 } from '@mui/material';
 
 import MainCard from 'ui-component/cards/MainCard';
 import { Container } from '../../ui-component/frosk/cards/Container';
 import ColumnBox from '../../ui-component/frosk/ColumnBox';
 import { gridSpacing } from 'store/constant';
-import config from 'config';
 
 const SecuritiesCard = ( {securities}) => {
   const columns = useMemo(

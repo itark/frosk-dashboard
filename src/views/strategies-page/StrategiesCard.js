@@ -8,12 +8,11 @@ import {
   Typography,
   ListItemIcon,
   MenuItem,
+  Tooltip,
   useMediaQuery
 } from '@mui/material';
 
 import { AccountCircle, Send } from '@mui/icons-material';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import Collapse from '@mui/material/Collapse';
 import IconButton from '@mui/material/IconButton';
 import { styled } from '@mui/material/styles';
 import ReactImageFallback from "react-image-fallback";
@@ -36,7 +35,7 @@ const StrategiesCard = ( {featuredStrategies}) => {
       {
         accessorKey: 'name',
         header: 'Strategy',
-        size: 50,
+        size: 20,
         Cell: ({ cell, row }) => (
           <Box
             sx={{
@@ -75,10 +74,35 @@ const StrategiesCard = ( {featuredStrategies}) => {
       },
       {
         accessorKey: 'totalProfit',
-        header: 'Total profit',
+        header: 'Return',
         size: 5,
         Cell: ({ cell }) =>
         <ColumnBox cell={cell}></ColumnBox>  
+      },
+      {
+        accessorKey: 'sqn',
+        header: 'SQN',
+        size: 2,
+      }, 
+      {
+        accessorKey: 'expectancy',
+        header: 'Expectancy',
+        size: 2,
+      },       
+      {
+        accessorKey: 'profitableTradesRatio',
+        header: 'Profitable ratio',
+        size: 2,
+      },   
+      {
+        accessorKey: 'maxDD',
+        header: 'Max drawdown',
+        size: 2,
+      }, 
+      {
+        accessorKey: 'numberofTrades',
+        header: 'Trades',
+        size: 2,
       },
       {
         accessorKey: 'period',
@@ -89,31 +113,6 @@ const StrategiesCard = ( {featuredStrategies}) => {
         accessorKey: 'latestTrade',
         header: 'Latest trade',
         size: 50,
-      }, 
-      {
-        accessorKey: 'numberOfTicks',
-        header: 'Bars',
-        size: 2,
-      },  
-      {
-        accessorKey: 'numberofTrades',
-        header: 'Trades',
-        size: 2,
-      },
-      {
-        accessorKey: 'averageTickProfit',
-        header: 'Avg. tickprofit',
-        size: 2,
-      },        
-      {
-        accessorKey: 'profitableTradesRatio',
-        header: 'Profitable ratio',
-        size: 2,
-      },   
-      {
-        accessorKey: 'maxDD',
-        header: 'Max drawdown',
-        size: 2,
       }, 
       {
         accessorKey: 'isOpen',
@@ -145,21 +144,6 @@ const StrategiesCard = ( {featuredStrategies}) => {
       virtualizerInstanceRef.current.scrollToIndex(0);
     }
   }, [sorting]);
-
-  const handleExpandClick = () => {
-    setExpanded(!expanded);
-  };  
-
-  const ExpandMore = styled((props) => {
-    const { expand, ...other } = props;
-    return <IconButton {...other} />;
-  })(({ theme, expand }) => ({
-    transform: !expand ? 'rotate(0deg)' : 'rotate(180deg)',
-    marginLeft: 'auto',
-    transition: theme.transitions.create('transform', {
-      duration: theme.transitions.duration.shortest,
-    }),
-  }));
 
   const getStrategies = () => {
     const strats = [];
@@ -201,16 +185,40 @@ const StrategiesCard = ( {featuredStrategies}) => {
               <Grid container spacing={gridSpacing}>
                 <Grid item xs={12}>
                   <MaterialReactTable
+                    hoveredRow
                     columns={columns}
                     data={featuredStrategies}
+                    renderTopToolbar={(table) => <Box sx={{
+                      p: '20rem'
+                    }}>Custom Top Toolbar</Box>}
+                    displayColumnDefOptions={{
+                      'mrt-row-actions': {
+                        header: 'Actions', //change header text
+                        size: 1, //make actions column wider
+                      },
+                      'mrt-row-expand': {
+                        header: 'Expand', //change header text
+                        size: 1, //make actions column wider
+                      },
+                    }}
                     enableColumnFilterModes
                     enableGlobalFilterModes
                     enablePagination={false}
                     enableRowVirtualization
                     enableRowActions
+                    enableColumnResizing
                     initialState={{ sorting: [{ id: 'totalProfit', desc: false }],
                                     density: 'compact', 
                                     showColumnFilters: true ,
+                                      columnFilters: [{
+                                        id: 'sqn',
+                                        value: [2,4]
+                                      }, 
+                                    //{
+                                    //   id: 'expectancy',
+                                    //   value: [2, 3]
+                                    // }
+                                  ]
                                   }}
                     enableExpandAll={false}                              
                     renderDetailPanel={({ row }) => (
@@ -223,7 +231,6 @@ const StrategiesCard = ( {featuredStrategies}) => {
                     renderRowActionMenuItems={({ row }) => [
                       <MenuItem
                         key={0}
-                        //onClick={openStrategy}     
                         onClick={() => {
                           openStrategy(row.original);
                         }}             
