@@ -78,6 +78,40 @@ const InformationList = () => {
         >
             <ListItemWrapper>
                 <ListItem alignItems="center">
+                    <ListItemText primary="Performance"/>
+                </ListItem>
+            </ListItemWrapper>
+            <ListItemWrapper>
+                <ListItem alignItems="center">
+                    <ListItemAvatar>
+                        <Avatar alt="John Doe" src={User1} />
+                    </ListItemAvatar>
+                    <ListItemText primary="Smart Signals" />
+                </ListItem>
+                <Grid container direction="column" className="list-container">
+                    <Grid item xs={12} sx={{ pb: 2 }}>
+                        <Typography variant="subtitle2">Very very smart algo, buy after recommendations, these strategies hava a open position.</Typography>
+                    </Grid>
+                </Grid>
+            </ListItemWrapper>       
+            <ListItemWrapper>
+                <ListItem alignItems="center">
+                    <ListItemAvatar>
+                        <Avatar alt="John Doe" src={User1} />
+                    </ListItemAvatar>
+                    <ListItemText primary="Top Featured Strategies" />
+                </ListItem>
+                <Grid container direction="column" className="list-container">
+                    <Grid item xs={12} sx={{ pb: 2 }}>
+                        <Typography variant="subtitle2">Top strategies, selection from all featured strategies with filter on SQN(1.7) and postiive Expectency</Typography>
+                    </Grid>
+                </Grid>
+            </ListItemWrapper>    
+
+
+
+            <ListItemWrapper>
+                <ListItem alignItems="center">
                     <ListItemText primary="Strategies"/>
                 </ListItem>
             </ListItemWrapper>

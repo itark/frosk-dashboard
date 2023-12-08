@@ -13,7 +13,7 @@ import Chart from 'react-apexcharts';
 import MainCard from 'ui-component/cards/MainCard';
 import { gridSpacing } from 'store/constant';
 import config from 'config';
-import topData from './chart-data/top-chart';
+import topDataQ from './chart-data/top-chart-q';
 import StorefrontTwoToneIcon from '@mui/icons-material/StorefrontTwoTone';
 
 
@@ -45,27 +45,26 @@ const CardWrapper = styled(MainCard)(({ theme }) => ({
 
 // ==============================|| COPY FROM DASHBOARD DEFAULT - TOTAL GROWTH BAR CHART ||============================== //
 
-const TopStrategyPerformanceBarChart = ({ isLoading }) => {
+const TopStrategyPerformanceQualityBarChart = ({ isLoading }) => {
     const theme = useTheme();
-    const [value, setValue] = useState('today');
 
     useEffect(() => {
         const data = [];
         fetch(config.baseApi+"/topStrategies")
         .then(response => response.json())
         .then((response) => {
-                console.log('response',response)
+                console.log('topStrategies',response)
                 for (let i = 0; i < response.length; i++) {
                     data.push(  {
                       x: response[i].name,
-                      y: response[i].totalProfit
+                      y: response[i].sqn
                     })
                 }  
                 const newChartData = {
-                    ...topData.options,
+                    ...topDataQ.options,
                     series: [{data}],
                 }   
-                ApexCharts.exec(`top-chart`, 'updateOptions', newChartData);
+                ApexCharts.exec(`top-chart-q`, 'updateOptions', newChartData);
         })
     }, []);
 
@@ -75,17 +74,6 @@ const TopStrategyPerformanceBarChart = ({ isLoading }) => {
                 <Grid container spacing={gridSpacing}>
                     <Grid item xs={12}>
                        <CardWrapper border={false} content={false}>         
-      
-                        {/* <Grid container alignItems="center" justifyContent="space-between">
-                            <Grid item>
-                                <Grid container direction="column" spacing={1}>
-                                    <Grid item>
-                                        <Typography variant="subtitle1">Strategy Average Performance</Typography>
-                                    </Grid>
-                                </Grid>
-                            </Grid>
-                        </Grid> */}
-
                         <Box sx={{ p: 2 }}>
                                 <List sx={{ py: 0 }}>
                                     <ListItem alignItems="center" disableGutters sx={{ py: 0 }}>
@@ -109,7 +97,7 @@ const TopStrategyPerformanceBarChart = ({ isLoading }) => {
                                                 mb: 0.45
                                             }}
                                             primary={<Typography variant="h4">
-                                                    Strategy Average Performance
+                                                    Quality Average Performance
                                                     </Typography>}
                                             secondary={
                                                 <Typography
@@ -119,23 +107,17 @@ const TopStrategyPerformanceBarChart = ({ isLoading }) => {
                                                         mt: 0.5
                                                     }}
                                                 >
-                                                   Average profit per available strategy.
+                                                   Average SQN per available strategy.
                                                 </Typography>
                                             }
                                         />
                                     </ListItem>
                                 </List>
                             </Box>
-
-
-
-
-
-
                         </CardWrapper>
                     </Grid>
                     <Grid item xs={12}>
-                        <Chart {...topData} />
+                        <Chart {...topDataQ} />
                     </Grid>
                 </Grid>
             </MainCard>
@@ -143,8 +125,8 @@ const TopStrategyPerformanceBarChart = ({ isLoading }) => {
     );
 };
 
-TopStrategyPerformanceBarChart.propTypes = {
+TopStrategyPerformanceQualityBarChart.propTypes = {
     isLoading: PropTypes.bool
 };
 
-export default TopStrategyPerformanceBarChart;
+export default TopStrategyPerformanceQualityBarChart;

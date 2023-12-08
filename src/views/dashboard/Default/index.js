@@ -5,6 +5,7 @@ import { Grid } from '@mui/material';
 
 import StrategyPerformanceChartCard from './StrategyPerformanceChartCard';
 import TopStrategyPerformanceBarChart from './TopStrategyPerformanceBarChart';
+import TopStrategyPerformanceQualityBarChart from './TopStrategyPerformanceQualityBarChart';
 import TopFeaturedStrategyCard from './TopFeaturedStrategyCard';
 import OpenSmartSignalsCard from './OpenSmartSignalsCard';
 import { gridSpacing } from 'store/constant';
@@ -74,6 +75,9 @@ const Dashboard = () => {
                 <Grid container spacing={gridSpacing}>
                     <Grid item lg={12} md={12} sm={12} xs={12}>
                         <TopStrategyPerformanceBarChart isLoading={isLoading} />
+                    </Grid>                    
+                    <Grid item lg={12} md={12} sm={12} xs={12}>
+                        <TopStrategyPerformanceQualityBarChart isLoading={isLoading} />
                     </Grid>                    
                 </Grid>
             </Grid>
