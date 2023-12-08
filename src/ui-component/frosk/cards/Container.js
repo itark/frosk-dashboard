@@ -42,7 +42,7 @@ export const Container = (props) => {
 	const orange = '#e69138';
 	const red = '#be4d25';
 	const [chartLayoutOptions, setChartLayoutOptions] = useState({});
-	const markers = [];
+	var markers = [];
 	const candleSeries = useRef(null);
 	const volumeSeries = useRef(null);
 	const shortEmaSeries = useRef(null);
@@ -300,7 +300,8 @@ export const Container = (props) => {
 			}
 		}
 		//if (markers) console.log('markers values',markers.length)
-		//if (markers) console.log('response.trades',response.trades)				
+		//if (markers) console.log('response.trades',response.trades)		
+		markers = markers.sort((a,b) => (a.time - b.time));
 		candleSeries.current.setMarkers(markers);
 	}
 
