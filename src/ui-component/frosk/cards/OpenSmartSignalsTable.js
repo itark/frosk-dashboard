@@ -33,6 +33,11 @@ export const OpenSmartSignalsTable = ({smartSignals}) => {
         Cell: ({ cell }) =>
         <ColumnBox cell={cell}></ColumnBox>  
       },
+      {
+        accessorKey: 'close',
+        header: 'Current price',
+        size: 5
+      },
     ],
     [],
   );
