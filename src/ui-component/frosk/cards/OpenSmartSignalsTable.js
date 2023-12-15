@@ -1,8 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import React, { useMemo,  Box, useEffect, useState } from 'react';
-import MaterialReactTable from 'material-react-table';
-import generic from 'assets/images/generic.svg';
-import ReactImageFallback from "react-image-fallback";
+import { MaterialReactTable } from 'material-react-table';
 import ColumnBox from '../ColumnBox';
 
 export const OpenSmartSignalsTable = ({smartSignals}) => {
