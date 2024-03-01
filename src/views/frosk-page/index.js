@@ -32,6 +32,8 @@ const FroskPage = () => {
                 setIsLoaded(true);
                 setLoading(false);
                 setError(error);
+
+                console.error(error);
             }
             )
     }, [])
@@ -47,4 +49,5 @@ const FroskPage = () => {
     );
 
 };
+
 export default FroskPage;

@@ -36,8 +36,6 @@ const CardWrapper = styled(MainCard)(({ theme }) => ({
     }
 }));
 
-
-
 const TopFeaturedStrategyCard = ({ isLoading }) => {
     const theme = useTheme();
     const [topFeaturedStrategies, setTopFeaturedStrategies] = useState([]);
@@ -99,7 +97,7 @@ const TopFeaturedStrategyCard = ({ isLoading }) => {
                             </Box>
                             <Grid container alignContent="center" justifyContent="space-between">
                                 <Grid item>
-                                    {topFeaturedStrategies ?  <TopFeaturedStrategiesTable topFeaturedStrategies={topFeaturedStrategies}/> :null}
+                                    {topFeaturedStrategies.length > 0 ?  <TopFeaturedStrategiesTable topFeaturedStrategies={topFeaturedStrategies}/> :null}
                                 </Grid>
                             </Grid>
                         </CardWrapper>

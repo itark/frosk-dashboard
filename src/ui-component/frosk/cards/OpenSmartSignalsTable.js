@@ -1,13 +1,10 @@
 import { useNavigate } from 'react-router-dom';
 import React, { useMemo,  Box, useEffect, useState } from 'react';
-import { MaterialReactTable } from 'material-react-table';
+import { MaterialReactTable, useMaterialReactTable } from 'material-react-table';
 import ColumnBox from '../ColumnBox';
 
 export const OpenSmartSignalsTable = ({smartSignals}) => {
-  const [data, setData] = useState();
-
-  console.log('smartSignals',smartSignals);
-
+  const [data, setData] = useState([]);
   const columns = useMemo(
     () => [
       {
@@ -41,9 +38,10 @@ export const OpenSmartSignalsTable = ({smartSignals}) => {
   );
 
   useEffect(() => {
+    if (typeof window !== 'undefined') {
       setData(smartSignals);
+    }
   }, [smartSignals]);
-
 
   const useNavigateParam = () => {
     const navigate = useNavigate();
@@ -59,25 +57,22 @@ export const OpenSmartSignalsTable = ({smartSignals}) => {
     navigateParam('/container-page', row);
   }
 
+  const table = useMaterialReactTable({
+    columns,
+    data, 
+    enableTopToolbar:false,
+    muiTableBodyRowProps: ({ row }) => ({
+      onClick: (event) => {
+        openStrategy(row.original);
+      },
+      sx: {
+        cursor: 'pointer', //you might want to change the cursor too when adding an onClick
+      },
+    }),
 
-  return (
-    <>
-    {data ? <MaterialReactTable
-      muiTableBodyRowProps={({ row }) => ({
-        onClick: (event) => {
-          openStrategy(row.original);
-        },
-        sx: {
-          cursor: 'grab', //you might want to change the cursor too when adding an onClick
-        },
-      })}
-      columns={columns}
-      data={data}
-      enableBottomToolbar={true}
-      enableTopToolbar={false}
-    />:null }
-    </>
-  );
+  });
+  return <MaterialReactTable table={table} />;
+
 };
 
 export default OpenSmartSignalsTable;

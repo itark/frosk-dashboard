@@ -38,8 +38,6 @@ const CardWrapper = styled(MainCard)(({ theme }) => ({
     }
 }));
 
-
-
 const OpenSmartSignalsCard = ({ isLoading }) => {
     const theme = useTheme();
     const [smartSignals, setSmartSignals] = useState([]);
@@ -47,9 +45,8 @@ const OpenSmartSignalsCard = ({ isLoading }) => {
     useEffect(() => {
         fetch(config.baseApi+"/smartSignals")
         .then(response => response.json())
-        .then((response) => {
-                console.log('response',response);
-                setSmartSignals(response);
+        .then((result) => {
+            setSmartSignals(result);
         })
     }, []);
 
@@ -97,7 +94,7 @@ const OpenSmartSignalsCard = ({ isLoading }) => {
                             </Box>
                             <Grid container alignContent="center" justifyContent="space-between"> 
                                 <Grid item>
-                                    {smartSignals ?  <OpenSmartSignalsTable smartSignals={smartSignals}/> :null}
+                                    {smartSignals.length > 0 ?  <OpenSmartSignalsTable smartSignals={smartSignals}/> :null}
                                 </Grid>
                             </Grid>
                          </CardWrapper>

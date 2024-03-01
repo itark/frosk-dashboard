@@ -22,6 +22,7 @@ const StrategiesPage = () => {
             .then(
             (response) => {
                 setIsLoaded(true);
+                //console.log('response',response);
                 setLoading(false);
                 setFeaturedStrategies(response);
             },
@@ -43,6 +44,14 @@ const StrategiesPage = () => {
             </Grid>
         </Grid>
     );
+
+    // return (
+    //     <Grid item>
+    //         {featuredStrategies ? <StrategiesCard3 featuredStrategies={featuredStrategies}></StrategiesCard3>: null}
+    //     </Grid>
+    // );
+
+
 };
 
 export default StrategiesPage;

@@ -1,13 +1,11 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import  { MaterialReactTable } from 'material-react-table';
+import  {  MaterialReactTable, useMaterialReactTable,  MRT_ToggleFiltersButton }  from 'material-react-table';
 import {
-  CardContent,
   Grid,
+  Box,
+  lighten,
 } from '@mui/material';
-
-import MainCard from 'ui-component/cards/MainCard';
 import { Container } from '../../ui-component/frosk/cards/Container';
-import ColumnBox from '../../ui-component/frosk/ColumnBox';
 import { gridSpacing } from 'store/constant';
 
 const SecuritiesCard = ( {securities}) => {
@@ -23,114 +21,115 @@ const SecuritiesCard = ( {securities}) => {
         header: 'Best strategy',
         size: 50,
       },
-      {
-        accessorKey: 'oneDayPercent',
-        header: '1d',
-        size: 5,
-        Cell: ({ cell }) =>
-         <ColumnBox cell={cell}></ColumnBox>
-      },
-      {
-        accessorKey: 'oneWeekPercent',
-        header: '1w',
-        size: 5,
-        Cell: ({ cell }) =>
-          <ColumnBox cell={cell}></ColumnBox>      
-      },
-      {
-        accessorKey: 'oneMonthPercent',
-        header: '1m',
-        size: 5,
-        Cell: ({ cell }) =>
-          <ColumnBox cell={cell}></ColumnBox>
-      },
-      {
-        accessorKey: 'threeMonthPercent',
-        header: '3m',
-        size: 5,
-        Cell: ({ cell }) =>
-          <ColumnBox cell={cell}></ColumnBox>
-      },
-      {
-        accessorKey: 'sixMonthPercent',
-        header: '6m',
-        size: 5,
-        Cell: ({ cell }) =>
-          <ColumnBox cell={cell}></ColumnBox>
-      }
+      // {
+      //   accessorKey: 'oneDayPercent',
+      //   header: '1d',
+      //   size: 5,
+      //   Cell: ({ cell }) =>
+      //    <ColumnBox cell={cell}></ColumnBox>
+      // },
+      // {
+      //   accessorKey: 'oneWeekPercent',
+      //   header: '1w',
+      //   size: 5,
+      //   Cell: ({ cell }) =>
+      //     <ColumnBox cell={cell}></ColumnBox>      
+      // },
+      // {
+      //   accessorKey: 'oneMonthPercent',
+      //   header: '1m',
+      //   size: 5,
+      //   Cell: ({ cell }) =>
+      //     <ColumnBox cell={cell}></ColumnBox>
+      // },
+      // {
+      //   accessorKey: 'threeMonthPercent',
+      //   header: '3m',
+      //   size: 5,
+      //   Cell: ({ cell }) =>
+      //     <ColumnBox cell={cell}></ColumnBox>
+      // },
+      // {
+      //   accessorKey: 'sixMonthPercent',
+      //   header: '6m',
+      //   size: 5,
+      //   Cell: ({ cell }) =>
+      //     <ColumnBox cell={cell}></ColumnBox>
+      // }
     ],
     [],
   );
 
-  //optionally access the underlying virtualizer instance
-  const virtualizerInstanceRef = useRef(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [sorting, setSorting] = useState([]);
   const [security, setSecurity] = useState();
+  const [data, setData] = useState([]);
   const [initSelectedStrategy, setInitSelectedStrategy] = useState();
+  const [sorting, setSorting] = useState([]);
+  const rowVirtualizerInstanceRef = useRef(null);
   
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      setIsLoading(false);
+      setData(securities);
     }
-  }, []);
+  }, [securities]);
 
   useEffect(() => {
-    if (virtualizerInstanceRef.current) {
-      virtualizerInstanceRef.current.scrollToIndex(0);
+    //scroll to the top of the table when the sorting changes
+    try {
+      rowVirtualizerInstanceRef.current?.scrollToIndex?.(0);
+    } catch (error) {
+      console.error(error);
     }
   }, [sorting]);
 
-  return (
-    <>
-        <MainCard >
-          <CardContent>
-              <Grid container spacing={gridSpacing}>
-                <Grid item xs={2}>
-                  <MaterialReactTable
-                    muiTableBodyRowProps={({ row }) => ({
-                      onClick: (event) => {
-                        setSecurity(row.original.name);
-                        setInitSelectedStrategy(row.original.bestStrategy)
-                      },
-                      sx: {
-                        cursor: 'pointer', //you might want to change the cursor too when adding an onClick
-                      },
-                      onLoad: (event) => {
-                        console.log('onLoad'); //Not working
-                      }
-                    })}
-                    columns={columns}
-                    data={securities}
-                    //optionally override the default column widths
-                    defaultColumn={{
-                      maxSize: 400,
-                      minSize: 100,
-                      size: 180, //default size is usually 180
-                    }}
-                    enableColumnResizing
-                    columnResizeMode="onChange" //default is "onEnd"                   
-                    enableColumnOrdering
-                    enableBottomToolbar={false}
-                    enableGlobalFilterModes
-                    enablePagination={false}
-                    enableRowVirtualization
-                    initialState={{ density: 'compact' }}
-                    muiTableContainerProps={{ sx: { maxHeight: '600px' } }}
-                    onSortingChange={setSorting}
-                    state={{ isLoading, sorting }}
-                    virtualizerInstanceRef={virtualizerInstanceRef} //optional
-                    virtualizerProps={{ overscan: 20 }} //optionally customize the virtualizer
-                  />
-                </Grid>
-                <Grid item xs={10} sx={{ pt: '16px !important' }}>
-                  { security ? <Container securityName={security} initSelectedStrategy={initSelectedStrategy}  disableStrategySelect={false}/>: null}    
-                </Grid>
+  const table = useMaterialReactTable({
+    columns,
+    data,
+    enableRowVirtualization: true,
+    enablePagination: false,
+    onSortingChange: setSorting,
+    enableBottomToolbar: false,
+    muiTableBodyRowProps: ({ row }) => ({
+      onClick: (event) => {
+        setSecurity(row.original.name);
+        setInitSelectedStrategy(row.original.bestStrategy)
+      },
+      sx: {
+        cursor: 'pointer', //you might want to change the cursor too when adding an onClick
+      },
+    }),
+    state: { sorting},
+    rowVirtualizerInstanceRef, //optional
+    rowVirtualizerOptions: { overscan: 5 }, //optionally customize the row virtualizer
+    columnVirtualizerOptions: { overscan: 2 }, //optionally customize the column virtualizer  
+    renderTopToolbar: ({ table }) => {
+      return (
+        <Box
+          sx={(theme) => ({
+            backgroundColor: lighten(theme.palette.background.default, 0.05),
+            display: 'flex',
+            gap: '0.5rem',
+            p: '8px',
+            justifyContent: 'space-between',
+          })}
+        >
+          <Box sx={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+            <MRT_ToggleFiltersButton table={table} />
+          </Box>
+        </Box>
+      );
+    },
+  });  
+  
+  return <Grid container spacing={gridSpacing}>
+            <Grid item xs={2}  md={2} lg={2}>
+              <MaterialReactTable table={table} />
             </Grid>
-          </CardContent>
-        </MainCard>  
-    </>
-  );
+            <Grid item xs={10}  md={10} lg={10} sx={{ pt: '16px !important' }}>
+              {security ? <Container securityName={security} initSelectedStrategy={initSelectedStrategy} disableStrategySelect={false} /> : null}
+            </Grid>
+      </Grid>
+  ;
+
 };
 
 export default SecuritiesCard;
