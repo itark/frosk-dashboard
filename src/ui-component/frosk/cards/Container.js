@@ -312,13 +312,25 @@ export const Container = (props) => {
                         <Grid item xs={12}>
                             <Grid container alignItems="center" justifyContent="space-between">
                                 <Grid item>
-                                {featuredStrategy ? <Grid container direction="column" spacing={1}>
+                                {featuredStrategy ? <Grid container spacing={1}>
                                         <Grid item>
-                                            <Typography variant="subtitle2">Total Profit</Typography>
+                                            <Typography variant="subtitle2">Profit</Typography>
                                         </Grid>
                                         <Grid item>
                                             <Typography variant="h3">{featuredStrategy.totalProfit}%</Typography>
                                         </Grid>
+										<Grid item>
+                                            <Typography variant="subtitle2">SQN</Typography>
+                                        </Grid>
+                                        <Grid item>
+                                            <Typography variant="h3">{featuredStrategy.sqn}</Typography>
+                                        </Grid>
+										<Grid item>
+                                            <Typography variant="subtitle2">Return in EUR</Typography>
+                                        </Grid>
+                                        <Grid item>
+                                            <Typography variant="h3">{featuredStrategy.totalGrossReturn} EUR</Typography>
+                                        </Grid>										
                                     </Grid> : null}
                                 </Grid>
                                 <Grid item>
@@ -419,7 +431,7 @@ export const Container = (props) => {
                         </Grid>
 
                         {featuredStrategy ? <Grid item xs={12}>  
-                          <Typography variant="h5">Trades {featuredStrategy.name} | {featuredStrategy.securityName} </Typography>
+                          <Typography variant="h5">{featuredStrategy.numberofTrades} Trades on {featuredStrategy.name} | {featuredStrategy.securityName} </Typography>
                           <ExpandMore
                               expand={expanded}
                               onClick={handleExpandClick}

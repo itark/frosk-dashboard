@@ -13,7 +13,7 @@ import { gridSpacing } from 'store/constant';
 import EarningCard from './EarningCard';
 import TotalOrderLineChartCard from './TotalOrderLineChartCard';
 import TotalIncomeDarkCard from './TotalIncomeDarkCard';
-import TotalIncomeLightCard from './TotalIncomeLightCard';
+import TotalTradingCard from './TotalTradingCard';
 import PopularCard from './PopularCard';
 
 // ==============================|| DEFAULT DASHBOARD ||============================== //
@@ -52,6 +52,9 @@ const Dashboard = () => {
 
             <Grid item xs={12}>
                 <Grid container spacing={gridSpacing}>
+                    <Grid item sm={6} xs={12} md={6} lg={12}>
+                        <TotalTradingCard isLoading={isLoading} />
+                    </Grid>
                     <Grid item lg={6} md={6} sm={6} xs={12}>
                          <OpenSmartSignalsCard isLoading={isLoading} />
                     </Grid>

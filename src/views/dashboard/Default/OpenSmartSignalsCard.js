@@ -46,6 +46,7 @@ const OpenSmartSignalsCard = ({ isLoading }) => {
         fetch(config.baseApi+"/smartSignals")
         .then(response => response.json())
         .then((result) => {
+            //console.log('smartSignals',result);
             setSmartSignals(result);
         })
     }, []);

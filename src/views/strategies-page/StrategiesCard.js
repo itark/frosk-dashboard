@@ -27,10 +27,7 @@ import {
 import { AccountCircle, Send } from '@mui/icons-material';
 
 const StrategiesCard = ({featuredStrategies}) => {
-
   console.log('featuredStrategies',featuredStrategies);
-
-
   const [data, setData] = useState([]);
 
   useEffect(() => {
@@ -141,18 +138,12 @@ const StrategiesCard = ({featuredStrategies}) => {
 
   const table = useMaterialReactTable({
     columns,
-    data, //data must be memoized or stable (useState, useMemo, defined outside of this component, etc.)
-    enableColumnFilterModes: true,
-    enableColumnOrdering: true,
+    data,
     enableGrouping: true,
-    enableColumnPinning: true,
     enableRowActions: true,
-    enableRowSelection: false,
     enableExpandAll: false,
-    initialState: { pagination: { pageSize: 25, pageIndex: 2 },  
-                    sorting: [{ id: 'totalProfit', desc: true },{ id: 'sqn', desc: true }],
-                  },
-    positionToolbarAlertBanner: 'bottom',
+    enablePagination: false,
+    initialState: { sorting: [{ id: 'totalProfit', desc: true },{ id: 'sqn', desc: true }],},
     muiTableContainerProps: { sx: { height: '80%', width: '100%' } },
     renderDetailPanel:({ row }) => (
       <Grid container spacing={gridSpacing}>

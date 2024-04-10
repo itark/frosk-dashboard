@@ -1,37 +1,45 @@
 import { useNavigate } from 'react-router-dom';
-import React, { useMemo,  Box, useEffect, useState } from 'react';
-import { MaterialReactTable } from 'material-react-table';
+import React, { useMemo, useEffect, useState } from 'react';
+import { MaterialReactTable, useMaterialReactTable } from 'material-react-table';
 import ColumnBox from '../ColumnBox';
 
 export const TopFeaturedStrategiesTable = ({topFeaturedStrategies}) => {
-  const [data, setData] = useState();
-
-  console.log('topFeaturedStrategies',topFeaturedStrategies);
-
+  const [data, setData] = useState([]);
   const columns = useMemo(
     () => [
       {
         accessorKey: 'name',
         header: 'Strategy',
-        size: 50,
+        size: 20,
       },
       {
         accessorKey: 'securityName',
-        header: 'Security'
+        header: 'Security',
+        size: 5,
       },
       {
         accessorKey: 'totalProfit',
-        header: 'Total profit',
+        header: 'Profit',
         size: 5,
         Cell: ({ cell }) =>
         <ColumnBox cell={cell}></ColumnBox>  
+      },
+      {
+        accessorKey: 'totalGrossReturn',
+        header: 'Return',
+        size: 5,
+        Cell: ({ cell }) => {
+          return <div>{cell.getValue()} EUR</div>;
+        },
       },
     ],
     [],
   );
 
   useEffect(() => {
+    if (typeof window !== 'undefined') {
       setData(topFeaturedStrategies);
+    }
   }, [topFeaturedStrategies]);
 
 
@@ -49,25 +57,20 @@ export const TopFeaturedStrategiesTable = ({topFeaturedStrategies}) => {
     navigateParam('/container-page', row);
   }
 
-
-  return (
-    <>
-    {data ? <MaterialReactTable
-      muiTableBodyRowProps={({ row }) => ({
-        onClick: (event) => {
-          openStrategy(row.original);
-        },
-        sx: {
-          cursor: 'grab', //you might want to change the cursor too when adding an onClick
-        },
-      })}
-      columns={columns}
-      data={data}
-      enableBottomToolbar={true}
-      enableTopToolbar={false}
-    />:null }
-    </>
-  );
+  const table = useMaterialReactTable({
+    columns,
+    data, 
+    enableTopToolbar:false,
+    muiTableBodyRowProps: ({ row }) => ({
+      onClick: (event) => {
+        openStrategy(row.original);
+      },
+      sx: {
+        cursor: 'pointer', //you might want to change the cursor too when adding an onClick
+      },
+    }),
+  });
+  return <MaterialReactTable table={table} />;
 };
 
 export default TopFeaturedStrategiesTable;

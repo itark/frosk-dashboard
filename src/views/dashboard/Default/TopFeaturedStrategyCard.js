@@ -44,7 +44,7 @@ const TopFeaturedStrategyCard = ({ isLoading }) => {
         fetch(config.baseApi+"/topFeaturedStrategies")
         .then(response => response.json())
         .then((response) => {
-                console.log('response',response);
+                //console.log('topFeaturedStrategies',response);
                 setTopFeaturedStrategies(response);
         })
     }, []);

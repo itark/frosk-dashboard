@@ -23,3 +23,7 @@ node_modules
 # OS-specific files
 **/.DS_Store
 frosk-dashboard.iml
+
+package-lock.json
+
+yarn.lock

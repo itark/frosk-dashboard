@@ -15,23 +15,29 @@ export const OpenSmartSignalsTable = ({smartSignals}) => {
       {
         accessorKey: 'name',
         header: 'Strategy',
-        size: 50,
+        size: 8,
       },
       {
         accessorKey: 'securityName',
-        header: 'Security'
+        header: 'Security',
+        size: 2,
       },
       {
         accessorKey: 'totalProfit',
-        header: 'Total profit',
-        size: 5,
+        header: 'Profit',
+        size: 2,
         Cell: ({ cell }) =>
         <ColumnBox cell={cell}></ColumnBox>  
       },
       {
+        accessorKey: 'totalGrossReturn',
+        header: 'Return',
+        size: 2,
+      },
+      {
         accessorKey: 'close',
         header: 'Current price',
-        size: 5
+        size: 2
       },
     ],
     [],
@@ -52,7 +58,6 @@ export const OpenSmartSignalsTable = ({smartSignals}) => {
   };
   const navigateParam = useNavigateParam();
 
-
   const openStrategy = (row) => {
     navigateParam('/container-page', row);
   }
@@ -72,7 +77,6 @@ export const OpenSmartSignalsTable = ({smartSignals}) => {
 
   });
   return <MaterialReactTable table={table} />;
-
 };
 
 export default OpenSmartSignalsTable;
