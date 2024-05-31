@@ -330,7 +330,7 @@ export const Container = (props) => {
                                         </Grid>
                                         <Grid item>
                                             <Typography variant="h3">{featuredStrategy.totalGrossReturn} EUR</Typography>
-                                        </Grid>										
+                                        </Grid>		
                                     </Grid> : null}
                                 </Grid>
                                 <Grid item>
@@ -350,6 +350,8 @@ export const Container = (props) => {
                                 </Grid>
                             </Grid>
                         </Grid>
+						<Grid item id="legend">
+                        </Grid>	
                         <Grid item xs={12}>
 							<Chart layout={chartLayoutOptions} securityName={securityName}>
 								<Candles
@@ -462,6 +464,10 @@ export function Chart(props) {
 
 export const ChartContainer = forwardRef((props, ref) => {
 	const { children, container, layout, ...rest } = props;
+
+	console.log('container',container);
+
+
 	const { securityName } = props;
 	const chartApiRef = useRef({
 		api() {
@@ -584,24 +590,20 @@ export const Candles = forwardRef((props, ref) => {
 		const currentRef = context.current;
 		const { children, ...rest } = props;
 		currentRef.candles().applyOptions(rest);
-		//const container = document.getElementById('container');
-		const container = parent.api();
-
-		const legend = document.createElement('div');
-		legend.style = `position: absolute; left: 12px; top: 12px; z-index: 1; font-size: 14px; font-family: sans-serif; line-height: 18px; font-weight: 300;`;
-		legend.style.color = 'black';
-		//container.appendChild(legend);
 
 		parent.api().subscribeCrosshairMove(param => {
-			let close = '';
+			let open, high, low, close = '';
 			if (param.time) {
 				const price = param.seriesPrices.get(currentRef.candles());
+				open = price.open;
+				high = price.high;
+				low = price.low;
 				close = price.close;
-				//console.log('(close',close);
 			}
-			// legend is a html element which has already been created
-			//legend.innerHTML = `${securityName} <strong>${close}</strong>`;
-			legend.innerHTML = `<strong>${close}</strong>`;
+			if (document.getElementById("legend") !== null) {
+				document.getElementById("legend").innerHTML = `Open:<strong>${open}</strong> High:<strong>${high}</strong> Low:<strong>${low}</strong> Close:<strong>${close}</strong>`;
+			}
+
 		});
 
 

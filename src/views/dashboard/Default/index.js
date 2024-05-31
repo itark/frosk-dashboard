@@ -14,6 +14,7 @@ import EarningCard from './EarningCard';
 import TotalOrderLineChartCard from './TotalOrderLineChartCard';
 import TotalIncomeDarkCard from './TotalIncomeDarkCard';
 import TotalTradingCard from './TotalTradingCard';
+import TotalTradingCard2 from './TotalTradingCard2';
 import PopularCard from './PopularCard';
 
 // ==============================|| DEFAULT DASHBOARD ||============================== //
@@ -53,13 +54,15 @@ const Dashboard = () => {
             <Grid item xs={12}>
                 <Grid container spacing={gridSpacing}>
                     <Grid item sm={6} xs={12} md={6} lg={12}>
-                        <TotalTradingCard isLoading={isLoading} />
+                        {/* <TotalTradingCard isLoading={isLoading} /> */}
+
+                        <TotalTradingCard2 isLoading={isLoading} />
                     </Grid>
                     <Grid item lg={6} md={6} sm={6} xs={12}>
-                         <OpenSmartSignalsCard isLoading={isLoading} />
+                       <TopFeaturedStrategyCard isLoading={isLoading} />   
                     </Grid>
                     <Grid item lg={6} md={6} sm={6} xs={12}>
-                        <TopFeaturedStrategyCard isLoading={isLoading} />
+                        <OpenSmartSignalsCard isLoading={isLoading} />
                     </Grid> 
                     {/* <Grid item lg={4} md={12} sm={12} xs={12}>
                         <Grid container spacing={gridSpacing}>

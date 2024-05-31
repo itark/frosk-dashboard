@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 
 // material-ui
 import { useTheme, styled } from '@mui/material/styles';
@@ -12,6 +12,7 @@ import config from 'config';
 
 // assets
 import StorefrontTwoToneIcon from '@mui/icons-material/StorefrontTwoTone';
+import TableChartOutlinedIcon from '@mui/icons-material/TableChartOutlined';
 
 // styles
 const CardWrapper = styled(MainCard)(({ theme }) => ({
@@ -43,15 +44,16 @@ const CardWrapper = styled(MainCard)(({ theme }) => ({
 
 const TotalTradingCard = ({ isLoading }) => {
     const theme = useTheme();
-
+    const [totalTrading, setTotalTrading] = useState();
 
     useEffect(() => {
         fetch(config.baseApi+"/totalTrading")
         .then(response => response.json())
         .then((result) => {
+            console.log('isLoading',isLoading);
             console.log('totalTrading',result);
-            //setSmartSignals(result);
-        })
+            setTotalTrading(result);
+         })
     }, []);
 
 
@@ -63,7 +65,8 @@ const TotalTradingCard = ({ isLoading }) => {
                 <CardWrapper border={false} content={false}>
                     <Box sx={{ p: 2 }}>
                         <List sx={{ py: 0 }}>
-                            <ListItem alignItems="center" disableGutters sx={{ py: 0 }}>
+
+                        <ListItem alignItems="center" disableGutters sx={{ py: 0 }}>
                                 <ListItemAvatar>
                                     <Avatar
                                         variant="rounded"
@@ -83,7 +86,7 @@ const TotalTradingCard = ({ isLoading }) => {
                                         mt: 0.45,
                                         mb: 0.45
                                     }}
-                                    primary={<Typography variant="h4">85000 EUR</Typography>}
+                                    primary={<Typography variant="h4">{totalTrading ? totalTrading.type:null} / YES</Typography>}
                                     secondary={
                                         <Typography
                                             variant="subtitle2"
@@ -92,7 +95,26 @@ const TotalTradingCard = ({ isLoading }) => {
                                                 mt: 0.5
                                             }}
                                         >
-                                            Total value
+                                            Account type / Common exitrule
+                                        </Typography>
+                                    }
+                                />  
+                                <ListItemText
+                                    sx={{
+                                        py: 0,
+                                        mt: 0.45,
+                                        mb: 0.45
+                                    }}
+                                    primary={<Typography variant="h4">{totalTrading ? totalTrading.accountValue:null} EUR</Typography>}
+                                    secondary={
+                                        <Typography
+                                            variant="subtitle2"
+                                            sx={{
+                                                color: theme.palette.grey[500],
+                                                mt: 0.5
+                                            }}
+                                        >
+                                            Account value
                                         </Typography>
                                     }
                                 />
@@ -102,7 +124,7 @@ const TotalTradingCard = ({ isLoading }) => {
                                         mt: 0.45,
                                         mb: 0.45
                                     }}
-                                    primary={<Typography variant="h4">15000 EUR</Typography>}
+                                    primary={<Typography variant="h4">{totalTrading ? totalTrading.initTotalValue:null} EUR</Typography>}
                                     secondary={
                                         <Typography
                                             variant="subtitle2"
@@ -111,17 +133,17 @@ const TotalTradingCard = ({ isLoading }) => {
                                                 mt: 0.5
                                             }}
                                         >
-                                            Security value
+                                            Initial value
                                         </Typography>
                                     }
-                                /> 
+                                />                                 
                                 <ListItemText
                                     sx={{
                                         py: 0,
                                         mt: 0.45,
                                         mb: 0.45
                                     }}
-                                    primary={<Typography variant="h4">20000 EUR</Typography>}
+                                    primary={<Typography variant="h4">{totalTrading ? totalTrading.positionValue:null} EUR</Typography>}
                                     secondary={
                                         <Typography
                                             variant="subtitle2"
@@ -140,7 +162,7 @@ const TotalTradingCard = ({ isLoading }) => {
                                         mt: 0.45,
                                         mb: 0.45
                                     }}
-                                    primary={<Typography variant="h4">45%</Typography>}
+                                    primary={<Typography variant="h4">{totalTrading ? totalTrading.totalReturnPercentage:null}%</Typography>}
                                     secondary={
                                         <Typography
                                             variant="subtitle2"
@@ -153,7 +175,117 @@ const TotalTradingCard = ({ isLoading }) => {
                                         </Typography>
                                     }
                                 />                                                                                               
+                            </ListItem>
 
+                            <ListItem alignItems="center" disableGutters sx={{ py: 0 }}>
+                                <ListItemAvatar>
+                                    <Avatar
+                                        variant="rounded"
+                                        sx={{
+                                            ...theme.typography.commonAvatar,
+                                            ...theme.typography.largeAvatar,
+                                            backgroundColor: theme.palette.warning.light,
+                                            color: theme.palette.warning.dark
+                                        }}
+                                    >
+                                        <TableChartOutlinedIcon fontSize="inherit" />
+                                    </Avatar>
+                                </ListItemAvatar>
+                                <ListItemText
+                                    sx={{
+                                        py: 0,
+                                        mt: 0.45,
+                                        mb: 0.45
+                                    }}
+                                    primary={<Typography variant="h4">{totalTrading ? totalTrading.type:null} / NO</Typography>}
+                                    secondary={
+                                        <Typography
+                                            variant="subtitle2"
+                                            sx={{
+                                                color: theme.palette.grey[500],
+                                                mt: 0.5
+                                            }}
+                                        >
+                                            Account type / Common exitrule
+                                        </Typography>
+                                    }
+                                />  
+                                <ListItemText
+                                    sx={{
+                                        py: 0,
+                                        mt: 0.45,
+                                        mb: 0.45
+                                    }}
+                                    primary={<Typography variant="h4">{totalTrading ? totalTrading.accountValue:null} EUR</Typography>}
+                                    secondary={
+                                        <Typography
+                                            variant="subtitle2"
+                                            sx={{
+                                                color: theme.palette.grey[500],
+                                                mt: 0.5
+                                            }}
+                                        >
+                                            Account value
+                                        </Typography>
+                                    }
+                                />
+                                <ListItemText
+                                    sx={{
+                                        py: 0,
+                                        mt: 0.45,
+                                        mb: 0.45
+                                    }}
+                                    primary={<Typography variant="h4">{totalTrading ? totalTrading.initTotalValue:null} EUR</Typography>}
+                                    secondary={
+                                        <Typography
+                                            variant="subtitle2"
+                                            sx={{
+                                                color: theme.palette.grey[500],
+                                                mt: 0.5
+                                            }}
+                                        >
+                                            Initial value
+                                        </Typography>
+                                    }
+                                />                                 
+                                <ListItemText
+                                    sx={{
+                                        py: 0,
+                                        mt: 0.45,
+                                        mb: 0.45
+                                    }}
+                                    primary={<Typography variant="h4">{totalTrading ? totalTrading.positionValue:null} EUR</Typography>}
+                                    secondary={
+                                        <Typography
+                                            variant="subtitle2"
+                                            sx={{
+                                                color: theme.palette.grey[500],
+                                                mt: 0.5
+                                            }}
+                                        >
+                                            Position value
+                                        </Typography>
+                                    }
+                                />  
+                                <ListItemText
+                                    sx={{
+                                        py: 0,
+                                        mt: 0.45,
+                                        mb: 0.45
+                                    }}
+                                    primary={<Typography variant="h4">{totalTrading ? totalTrading.totalReturnPercentage:null}%</Typography>}
+                                    secondary={
+                                        <Typography
+                                            variant="subtitle2"
+                                            sx={{
+                                                color: theme.palette.grey[500],
+                                                mt: 0.5
+                                            }}
+                                        >
+                                            Total return
+                                        </Typography>
+                                    }
+                                />                                                                                               
                             </ListItem>
                         </List>
                     </Box>

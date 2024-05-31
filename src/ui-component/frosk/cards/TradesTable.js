@@ -52,7 +52,10 @@ export const TradesTable = ({trades}) => {
     columns,
     data, 
     enableTopToolbar:false,
-    initialState: { density: 'compact', sorting: [{ id: 'dateReadable', desc: false }]},
+    initialState: { density: 'compact', 
+                    sorting: [{ id: 'dateReadable', desc: false }],
+                    pagination: { pageSize: 30 }
+                  },
   });
   return <MaterialReactTable table={table} />;
 

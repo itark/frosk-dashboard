@@ -8,14 +8,14 @@ export const OpenSmartSignalsTable = ({smartSignals}) => {
   const columns = useMemo(
     () => [
       {
-        accessorKey: 'latestTrade',
-        header: 'Date',
-        size: 10,
+        accessorKey: 'openTradeDate',
+        header: 'Open date',
+        size: 2,
       },  
       {
         accessorKey: 'name',
         header: 'Strategy',
-        size: 8,
+        size: 2,
       },
       {
         accessorKey: 'securityName',
@@ -23,22 +23,27 @@ export const OpenSmartSignalsTable = ({smartSignals}) => {
         size: 2,
       },
       {
+        accessorKey: 'openPrice',
+        header: 'Price',
+        size: 2,
+      },
+      {
+        accessorKey: 'closePrice',
+        header: 'Current price',
+        size: 2,
+      },
+      // {
+      //   accessorKey: 'totalGrossReturn',
+      //   header: 'Return',
+      //   size: 2,
+      // },
+      {
         accessorKey: 'totalProfit',
         header: 'Profit',
         size: 2,
         Cell: ({ cell }) =>
         <ColumnBox cell={cell}></ColumnBox>  
-      },
-      {
-        accessorKey: 'totalGrossReturn',
-        header: 'Return',
-        size: 2,
-      },
-      {
-        accessorKey: 'close',
-        header: 'Current price',
-        size: 2
-      },
+      },     
     ],
     [],
   );
