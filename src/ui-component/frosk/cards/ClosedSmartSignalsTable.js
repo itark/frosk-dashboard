@@ -1,69 +1,58 @@
 import { useNavigate } from 'react-router-dom';
-import React, { useMemo, useEffect, useState } from 'react';
+import React, { useMemo,  Box, useEffect, useState } from 'react';
 import { MaterialReactTable, useMaterialReactTable } from 'material-react-table';
 import ColumnBox from '../ColumnBox';
 
-export const TopFeaturedStrategiesTable = ({topFeaturedStrategies}) => {
+export const ClosedSmartSignalsTable = ({smartSignals}) => {
   const [data, setData] = useState([]);
   const columns = useMemo(
     () => [
       {
         accessorKey: 'totalProfit',
         header: 'Profit',
-        size: 5,
+        size: 2,
         Cell: ({ cell }) =>
         <ColumnBox cell={cell}></ColumnBox>  
-      },
+      }, 
+      {
+        accessorKey: 'openTradeDate',
+        header: 'Open date',
+        size: 2,
+      },  
+      {
+        accessorKey: 'closeTradeDate',
+        header: 'Close date',
+        size: 2,
+      }, 
       {
         accessorKey: 'name',
         header: 'Strategy',
-        size: 20,
+        size: 2,
       },
       {
         accessorKey: 'securityName',
         header: 'Security',
-        size: 5,
-      },
-      {
-        accessorKey: 'sqn',
-        header: 'Sqn',
         size: 2,
       },
       {
-        accessorKey: 'expectancy',
-        header: 'Expectancy',
+        accessorKey: 'openPrice',
+        header: 'Open price',
         size: 2,
       },
       {
-        accessorKey: 'profitableTradesRatio',
-        header: 'Win-ratio',
-        Cell: ({ cell }) =>
-          cell.getValue() + '%' ,
-        size: 5,
-      },
-      {
-        accessorKey: 'numberofTrades',
-        header: 'Trades',
+        accessorKey: 'closePrice',
+        header: 'Current price',
         size: 2,
       },
-      {
-        accessorKey: 'totalGrossReturn',
-        header: 'Return',
-        size: 5,
-        Cell: ({ cell }) => {
-          return <div>{cell.getValue()} EUR</div>;
-        },
-      },
-    ],
+      ],
     [],
   );
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      setData(topFeaturedStrategies);
+      setData(smartSignals);
     }
-  }, [topFeaturedStrategies]);
-
+  }, [smartSignals]);
 
   const useNavigateParam = () => {
     const navigate = useNavigate();
@@ -74,7 +63,6 @@ export const TopFeaturedStrategiesTable = ({topFeaturedStrategies}) => {
   };
   const navigateParam = useNavigateParam();
 
-
   const openStrategy = (row) => {
     navigateParam('/container-page', row);
   }
@@ -83,8 +71,6 @@ export const TopFeaturedStrategiesTable = ({topFeaturedStrategies}) => {
     columns,
     data, 
     enableTopToolbar:false,
-    initialState: { density: 'compact', 
-    },    
     muiTableBodyRowProps: ({ row }) => ({
       onClick: (event) => {
         openStrategy(row.original);
@@ -93,8 +79,9 @@ export const TopFeaturedStrategiesTable = ({topFeaturedStrategies}) => {
         cursor: 'pointer', //you might want to change the cursor too when adding an onClick
       },
     }),
+
   });
   return <MaterialReactTable table={table} />;
 };
 
-export default TopFeaturedStrategiesTable;
+export default ClosedSmartSignalsTable;

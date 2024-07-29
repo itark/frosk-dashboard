@@ -54,7 +54,6 @@ export const TotalTradingTable = ({tradingAccounts}) => {
     enableTopToolbar:false,
     initialState: { density: 'compact', 
                     sorting: [{ id: 'type', desc: false }],
-                   // pagination: { pageSize: 30 }
                   },
   });
   return <MaterialReactTable table={table} />;

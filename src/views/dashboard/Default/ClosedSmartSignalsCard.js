@@ -5,21 +5,24 @@ import { Grid, Avatar, Box, List, ListItem, ListItemAvatar, ListItemText, Typogr
 import MainCard from 'ui-component/cards/MainCard';
 import { gridSpacing } from 'store/constant';
 import config from 'config';
-import TopFeaturedStrategiesTable from 'ui-component/frosk/cards/TopFeaturedStrategiesTable';
+import OpenSmartSignalsTable from 'ui-component/frosk/cards/OpenSmartSignalsTable';
 
 // assets
-import StorefrontTwoToneIcon from '@mui/icons-material/StorefrontTwoTone';
+import TableChartOutlinedIcon from '@mui/icons-material/TableChartOutlined';
+import ClosedSmartSignalsTable from 'ui-component/frosk/cards/ClosedSmartSignalsTable';
 
 // styles
 const CardWrapper = styled(MainCard)(({ theme }) => ({
-    // overflow: 'hidden',
-    // position: 'relative',
+    backgroundColor: theme.palette.primary.dark,
+    color: theme.palette.primary.light,
+    overflow: 'hidden',
+    position: 'relative',
     '&:after': {
         content: '""',
         position: 'relative',
         // width: 210,
         // height: 210,
-        // background: `linear-gradient(210.04deg, ${theme.palette.warning.dark} -50.94%, rgba(144, 202, 249, 0) 83.49%)`,
+        // background: `linear-gradient(210.04deg, ${theme.palette.primary[200]} -50.94%, rgba(144, 202, 249, 0) 83.49%)`,
         // borderRadius: '50%',
         // top: -30,
         // right: -180
@@ -29,30 +32,30 @@ const CardWrapper = styled(MainCard)(({ theme }) => ({
         position: 'relative',
         // width: 210,
         // height: 210,
-        // background: `linear-gradient(140.9deg, ${theme.palette.warning.dark} -14.02%, rgba(144, 202, 249, 0) 70.50%)`,
+        // background: `linear-gradient(140.9deg, ${theme.palette.primary[200]} -14.02%, rgba(144, 202, 249, 0) 77.58%)`,
         // borderRadius: '50%',
         // top: -160,
         // right: -130
     }
 }));
 
-const TopFeaturedStrategyCard = ({ isLoading }) => {
+const ClosedSmartSignalsCard = ({ isLoading }) => {
     const theme = useTheme();
-    const [topFeaturedStrategies, setTopFeaturedStrategies] = useState([]);
+    const [smartSignals, setSmartSignals] = useState([]);
 
     useEffect(() => {
-        fetch(config.baseApi+"/topFeaturedStrategies")
+        fetch(config.baseApi+"/smartSignals?open=false")
         .then(response => response.json())
-        .then((response) => {
-                console.log('topFeaturedStrategies',response);
-                setTopFeaturedStrategies(response);
+        .then((result) => {
+            //console.log('smartSignals?open=false',result);
+            setSmartSignals(result);
         })
     }, []);
 
     return (
         <>
             <MainCard>
- 
+
                         <CardWrapper border={false} content={false}>
                             <Box sx={{ p: 2 }}>
                                 <List sx={{ py: 0 }}>
@@ -63,11 +66,11 @@ const TopFeaturedStrategyCard = ({ isLoading }) => {
                                                 sx={{
                                                     ...theme.typography.commonAvatar,
                                                     ...theme.typography.largeAvatar,
-                                                    backgroundColor: theme.palette.warning.light,
-                                                    color: theme.palette.warning.dark
+                                                    backgroundColor: theme.palette.primary[800],
+                                                    color: '#fff'
                                                 }}
                                             >
-                                                <StorefrontTwoToneIcon fontSize="inherit" />
+                                                <TableChartOutlinedIcon fontSize="inherit" />
                                             </Avatar>
                                         </ListItemAvatar>
                                         <ListItemText
@@ -76,18 +79,14 @@ const TopFeaturedStrategyCard = ({ isLoading }) => {
                                                 mt: 0.45,
                                                 mb: 0.45
                                             }}
-                                            primary={<Typography variant="h4">
-                                                    Top Featured Strategies
-                                                    </Typography>}
+                                            primary={
+                                                <Typography variant="h4" sx={{ color: '#fff' }}>
+                                                    Smart Signals - Closed
+                                                </Typography>
+                                            }
                                             secondary={
-                                                <Typography
-                                                    variant="subtitle2"
-                                                    sx={{
-                                                        color: theme.palette.grey[500],
-                                                        mt: 0.5
-                                                    }}
-                                                >
-                                                   Strategy on Security with highest total profit.
+                                                <Typography variant="subtitle2" sx={{ color: 'primary.light', mt: 0.25 }}>
+                                                    Smart closed signals.
                                                 </Typography>
                                             }
                                         />
@@ -95,13 +94,13 @@ const TopFeaturedStrategyCard = ({ isLoading }) => {
                                 </List>
                             </Box>
                                 <Grid item>
-                                    {topFeaturedStrategies.length > 0 ?  <TopFeaturedStrategiesTable topFeaturedStrategies={topFeaturedStrategies}/> :null}
+                                    {smartSignals.length > 0 ?  <ClosedSmartSignalsTable smartSignals={smartSignals}/> :null}
                                 </Grid>
-                        </CardWrapper>
+                         </CardWrapper>
 
             </MainCard>
         </>
     );
 };
 
-export default TopFeaturedStrategyCard;
+export default ClosedSmartSignalsCard;

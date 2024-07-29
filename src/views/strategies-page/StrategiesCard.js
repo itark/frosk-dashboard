@@ -59,12 +59,12 @@ const StrategiesCard = ({featuredStrategies}) => {
           accessorKey: 'name',
           filterVariant: 'autocomplete',
           header: 'Strategy',
-          size: 30,
+          size: 10,
         },
         {
           accessorKey: 'securityName',
           header: 'Security',
-          size: 20,
+          size: 10,
           Cell: ({ renderedCellValue, row }) => (
             <Box
               sx={{
@@ -104,28 +104,59 @@ const StrategiesCard = ({featuredStrategies}) => {
           },
           {
             accessorKey: 'profitableTradesRatio',
-            header: 'Ratio',
-            size: 2,
-          },   
+            header: 'Win ratio',
+            Cell: ({ cell }) =>
+              cell.getValue() + '%' ,
+            filterVariant: 'range-slider',
+            filterFn: 'betweenInclusive', // default (or between)
+            muiFilterSliderProps: {
+              //no need to specify min/max/step if using faceted values
+              marks: true,
+              max: 100, //custom max (as opposed to faceted max)
+              min: 0, //custom min (as opposed to faceted min)
+              step: 10,
+            },  
+          },              
           {
             accessorKey: 'maxDD',
-            header: 'MaxDD',
-            size: 2,
-          }, 
+            header: 'Max DD',
+            Cell: ({ cell }) =>
+              cell.getValue() + '%' ,
+            filterVariant: 'range-slider',
+            filterFn: 'betweenInclusive', // default (or between)
+            muiFilterSliderProps: {
+              //no need to specify min/max/step if using faceted values
+              marks: true,
+              max: 100, //custom max (as opposed to faceted max)
+              min: 0, //custom min (as opposed to faceted min)
+              step: 10,
+            },  
+          },  
+
           {
             accessorKey: 'numberofTrades',
             header: 'Trades',
-            size: 2,
-          },
+            Cell: ({ cell }) =>
+              cell.getValue(),
+            filterVariant: 'range-slider',
+            filterFn: 'betweenInclusive', // default (or between)
+            muiFilterSliderProps: {
+              //no need to specify min/max/step if using faceted values
+              marks: true,
+              max: 50, //custom max (as opposed to faceted max)
+              min: 0, //custom min (as opposed to faceted min)
+              step: 1,
+            },  
+          }, 
           {
             accessorKey: 'period',
             header: 'Period',
-            size: 70,
+            size: 50,
           },
           {
             accessorKey: 'latestTrade',
             header: 'Latest',
-            size: 50,
+            size: 20,
           }, 
           {
             accessorKey: 'isOpen',
@@ -139,12 +170,13 @@ const StrategiesCard = ({featuredStrategies}) => {
   const table = useMaterialReactTable({
     columns,
     data,
+    enableGlobalFilterModes: true,
     enableGrouping: true,
     enableRowActions: true,
     enableExpandAll: false,
     enablePagination: false,
-    initialState: { sorting: [{ id: 'totalProfit', desc: true },{ id: 'sqn', desc: true }],},
-    muiTableContainerProps: { sx: { height: '80%', width: '100%' } },
+    initialState: { showColumnFilters: true, sorting: [{ id: 'totalProfit', desc: true },{ id: 'sqn', desc: true }],},
+    //muiTableContainerProps: { sx: { height: '80%', width: '100%' } },
     renderDetailPanel:({ row }) => (
       <Grid container spacing={gridSpacing}>
         <Grid item xs={11}>  

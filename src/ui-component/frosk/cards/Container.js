@@ -467,7 +467,6 @@ export const ChartContainer = forwardRef((props, ref) => {
 
 	console.log('container',container);
 
-
 	const { securityName } = props;
 	const chartApiRef = useRef({
 		api() {
@@ -512,6 +511,17 @@ export const ChartContainer = forwardRef((props, ref) => {
 		const currentRef = chartApiRef.current;
 		currentRef.api();
 	}, []);
+
+
+	useLayoutEffect(() => {
+		const currentRef = chartApiRef.current;
+		const chart = currentRef.api();
+		chart.subscribeClick(clickHandler);
+	}, []);
+
+	function clickHandler() {
+		window.open('https://www.coinbase.com/advanced-trade/'+securityName, '_blank');
+	}
 
 	useLayoutEffect(() => {
 		const currentRef = chartApiRef.current;
@@ -605,9 +615,6 @@ export const Candles = forwardRef((props, ref) => {
 			}
 
 		});
-
-
-
 	});
 
 	useImperativeHandle(ref, 

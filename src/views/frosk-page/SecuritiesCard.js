@@ -84,8 +84,11 @@ const SecuritiesCard = ( {securities}) => {
   const table = useMaterialReactTable({
     columns,
     data,
+    defaultDisplayColumn: { enableResizing: true },
     enableRowVirtualization: true,
     enablePagination: false,
+    enableGlobalFilterModes: true,
+    initialState: { showColumnFilters: true},
     onSortingChange: setSorting,
     enableBottomToolbar: false,
     muiTableBodyRowProps: ({ row }) => ({

@@ -8,6 +8,7 @@ import { Typography, Grid, Tooltip } from '@mui/material';
 import { gridSpacing } from 'store/constant';
 import StrategiesCard from './StrategiesCard';
 import config from 'config';
+import MainCard from 'ui-component/cards/MainCard';
 
 const StrategiesPage = () => {
     const [isLoading, setLoading] = useState(true);
@@ -36,20 +37,12 @@ const StrategiesPage = () => {
 
 
     return (
-        <Grid item>
-            <Grid container spacing={gridSpacing}>
+            <MainCard>
                 <Grid item>
                     {featuredStrategies ? <StrategiesCard featuredStrategies={featuredStrategies}></StrategiesCard>: null}
                 </Grid>
-            </Grid>
-        </Grid>
+            </MainCard>
     );
-
-    // return (
-    //     <Grid item>
-    //         {featuredStrategies ? <StrategiesCard3 featuredStrategies={featuredStrategies}></StrategiesCard3>: null}
-    //     </Grid>
-    // );
 
 
 };

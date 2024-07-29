@@ -3,9 +3,8 @@ import { styled, useTheme } from '@mui/material/styles';
 import { Grid, Avatar, Box, List, ListItem, ListItemAvatar, ListItemText, Typography } from '@mui/material';
 
 import MainCard from 'ui-component/cards/MainCard';
-import { gridSpacing } from 'store/constant';
 import config from 'config';
-import OpenSmartSignalsTable from 'ui-component/frosk/cards/OpenSmartSignalsTable';
+import OpenSignalsTable from 'ui-component/frosk/cards/OpenSignalsTable';
 
 // assets
 import TableChartOutlinedIcon from '@mui/icons-material/TableChartOutlined';
@@ -38,23 +37,22 @@ const CardWrapper = styled(MainCard)(({ theme }) => ({
     }
 }));
 
-const OpenSmartSignalsCard = ({ isLoading }) => {
+const OpenSignalsCard = ({ isLoading }) => {
     const theme = useTheme();
-    const [smartSignals, setSmartSignals] = useState([]);
+    const [openSignals, setOpenSignals] = useState([]);
 
     useEffect(() => {
-        fetch(config.baseApi+"/smartSignals?open=true")
+        fetch(config.baseApi+"/openSignals")
         .then(response => response.json())
         .then((result) => {
-            //console.log('smartSignals?open=true',result);
-            setSmartSignals(result);
+            console.log('openSignals',result);
+            setOpenSignals(result);
         })
     }, []);
 
     return (
         <>
             <MainCard>
-
                         <CardWrapper border={false} content={false}>
                             <Box sx={{ p: 2 }}>
                                 <List sx={{ py: 0 }}>
@@ -80,12 +78,12 @@ const OpenSmartSignalsCard = ({ isLoading }) => {
                                             }}
                                             primary={
                                                 <Typography variant="h4" sx={{ color: '#fff' }}>
-                                                    Smart Signals
+                                                   Open Signals
                                                 </Typography>
                                             }
                                             secondary={
                                                 <Typography variant="subtitle2" sx={{ color: 'primary.light', mt: 0.25 }}>
-                                                    Smart open signals ready for trading.
+                                                    All open signals ready for trading.
                                                 </Typography>
                                             }
                                         />
@@ -93,13 +91,12 @@ const OpenSmartSignalsCard = ({ isLoading }) => {
                                 </List>
                             </Box>
                                 <Grid item>
-                                    {smartSignals.length > 0 ?  <OpenSmartSignalsTable smartSignals={smartSignals}/> :null}
+                                    {openSignals.length > 0 ?  <OpenSignalsTable openSignals={openSignals}/> :null}
                                 </Grid>
                          </CardWrapper>
-
             </MainCard>
         </>
     );
 };
 
-export default OpenSmartSignalsCard;
+export default OpenSignalsCard;
