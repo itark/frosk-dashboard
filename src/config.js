@@ -6,6 +6,7 @@ const config = {
     fontFamily: `'Roboto', sans-serif`,
     borderRadius: 12,
     baseApi: 'http://localhost:8080/frosk-analyzer',
+    //baseApi: 'http://172.232.152.62:8080/frosk-analyzer',
 };
 
 export default config;

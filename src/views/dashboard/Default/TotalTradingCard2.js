@@ -47,6 +47,7 @@ const TotalTradingCard2 = ({ isLoading }) => {
         fetch(config.baseApi+"/tradingAccounts")
         .then(response => response.json())
         .then((result) => {
+            console.log('config.baseApi',config.baseApi)
             console.log('tradingAccounts',result);
             setTradingAccounts(result);
         })
