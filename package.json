@@ -15,7 +15,7 @@
         "@mui/utils": "^5.8.6",
         "@mui/x-date-pickers": "^6.18.5",
         "@tabler/icons": "^1.72.0",
-        "apexcharts": "^3.35.3",
+        "apexcharts": "^3.52.0",
         "cryptocurrency-icons": "^0.18.1",
         "formik": "^2.2.9",
         "framer-motion": "^6.3.16",
@@ -24,7 +24,7 @@
         "material-ui-popup-state": "^4.0.1",
         "prop-types": "^15.8.1",
         "react": "^18.2.0",
-        "react-apexcharts": "^1.4.0",
+        "react-apexcharts": "^1.4.1",
         "react-device-detect": "^2.2.2",
         "react-dom": "^18.2.0",
         "react-image-fallback": "^8.0.0",
@@ -38,7 +38,7 @@
     },
     "scripts": {
         "start": "react-scripts start",
-        "build": "react-scripts build",
+        "build": "node --stack-size=1024 node_modules/react-scripts/scripts/build.js",
         "test": "react-scripts test",
         "eject": "react-scripts eject"
     },

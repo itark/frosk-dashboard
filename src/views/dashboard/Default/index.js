@@ -79,12 +79,12 @@ const Dashboard = () => {
                     <Grid item lg={12} md={12} sm={12} xs={12}>
                         <OpenSignalsCard isLoading={isLoading} />
                     </Grid>   
-                    <Grid item lg={12} md={12} sm={12} xs={12}>
+                    {/* <Grid item lg={12} md={12} sm={12} xs={12}>
                         <TopStrategyPerformanceBarChart isLoading={isLoading} />
                     </Grid>                    
                     <Grid item lg={12} md={12} sm={12} xs={12}>
                         <TopStrategyPerformanceQualityBarChart isLoading={isLoading} />
-                    </Grid>                    
+                    </Grid>                     */}
                 </Grid>
             </Grid>
         </Grid>
