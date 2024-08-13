@@ -9,6 +9,7 @@ import { Container } from '../../ui-component/frosk/cards/Container';
 import { gridSpacing } from 'store/constant';
 
 const SecuritiesCard = ( {securities}) => {
+  console.log('securities',securities);
   const columns = useMemo(
     () => [
       {
@@ -67,19 +68,20 @@ const SecuritiesCard = ( {securities}) => {
   const rowVirtualizerInstanceRef = useRef(null);
   
   useEffect(() => {
+    console.log('useEffect::securities, length', securities.length)
     if (typeof window !== 'undefined') {
       setData(securities);
     }
   }, [securities]);
 
-  useEffect(() => {
-    //scroll to the top of the table when the sorting changes
-    try {
-      rowVirtualizerInstanceRef.current?.scrollToIndex?.(0);
-    } catch (error) {
-      console.error(error);
-    }
-  }, [sorting]);
+  // useEffect(() => {
+  //   //scroll to the top of the table when the sorting changes
+  //   try {
+  //     rowVirtualizerInstanceRef.current?.scrollToIndex?.(0);
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // }, [sorting]);
 
   const table = useMaterialReactTable({
     columns,
