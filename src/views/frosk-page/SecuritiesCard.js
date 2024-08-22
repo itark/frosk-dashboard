@@ -17,11 +17,11 @@ const SecuritiesCard = ( {securities}) => {
         header: 'Namn',
         size: 50,
       },
-      {
-        accessorKey: 'bestStrategy',
-        header: 'Best strategy',
-        size: 50,
-      },
+      // {
+      //   accessorKey: 'bestStrategy',
+      //   header: 'Best strategy',
+      //   size: 50,
+      // },
       // {
       //   accessorKey: 'oneDayPercent',
       //   header: '1d',
@@ -68,7 +68,6 @@ const SecuritiesCard = ( {securities}) => {
   const rowVirtualizerInstanceRef = useRef(null);
   
   useEffect(() => {
-    console.log('useEffect::securities, length', securities.length)
     if (typeof window !== 'undefined') {
       setData(securities);
     }
