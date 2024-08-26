@@ -40,7 +40,8 @@
         "start": "react-scripts start",
         "build": "node --stack-size=1024 node_modules/react-scripts/scripts/build.js",
         "test": "react-scripts test",
-        "eject": "react-scripts eject"
+        "eject": "react-scripts eject",
+        "stop": "kill $(lsof -t -i:3000)" 
     },
     "eslintConfig": {
         "extends": [

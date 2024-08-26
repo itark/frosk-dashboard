@@ -78,7 +78,9 @@ export const Container = (props) => {
 	}, [selectedStrategy]);
 
 	useEffect(() => {
-		runSelectedAction();
+		if (selectedAction !== 'undefined') {
+			runSelectedAction();
+		}
 	}, [selectedAction]);
 
 	const handleExpandClick = () => {
@@ -127,6 +129,7 @@ export const Container = (props) => {
 	}
 
 	const runSelectedAction = () => {
+		
 		fetch(config.baseApi+"/runSelectedAction?action="+selectedAction+"&security="+securityName+"&strategy="+selectedStrategy)
 		.then((response) => response.json())
 		.then((response) => {
