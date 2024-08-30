@@ -3,7 +3,7 @@
 npm stop
 
 # Get latest
-git pull https://github.com/itark/frosk-dashboard.git
+git pull
 
 export NODE_OPTIONS=--max-old-space-size=1024
 
