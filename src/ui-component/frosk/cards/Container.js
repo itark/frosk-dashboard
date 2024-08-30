@@ -33,12 +33,10 @@ const Context = createContext();
 
 export const Container = (props) => {
 	const theme = useTheme();
-	const { securityName, initSelectedStrategy, disableStrategySelect, initSelectedAction, disableActionSelect} = props;
+	const { securityName, initSelectedStrategy, disableStrategySelect} = props;
 	const [selectedStrategy, setSelectedStrategy] = useState(initSelectedStrategy);
-	const [selectedAction, setSelectedAction] = useState(initSelectedAction);
 	const [featuredStrategy, setFeaturedStrategy] = useState();
 	const [strategies, setStrategies] = useState();
-	const [actions, setActions] = useState();
 	const [expanded, setExpanded] = useState(false);
     const blue = '#2962FF';
 	const orange = '#e69138';
@@ -62,7 +60,6 @@ export const Container = (props) => {
 	const shortCciSeries = useRef(null);
 
 	useEffect(() => {
-		getActions();
 		getStrategies();
 		setSelectedStrategy(initSelectedStrategy);
 		getFeaturedStrategy();
@@ -76,12 +73,6 @@ export const Container = (props) => {
 	useEffect(() => {
 		getFeaturedStrategy();
 	}, [selectedStrategy]);
-
-	useEffect(() => {
-		if (selectedAction !== 'undefined') {
-			runSelectedAction();
-		}
-	}, [selectedAction]);
 
 	const handleExpandClick = () => {
 		setExpanded(!expanded);
@@ -113,30 +104,6 @@ export const Container = (props) => {
 		  });
 	  }
 
-	const getActions = () => {
-		const actions = [];
-		fetch(config.baseApi+"/actions")
-			.then((response) => response.json())
-			.then((response) => {
-			for (let i = 0; i < response.length; i++) {
-				actions.push(  {
-				value: response[i],
-				label: response[i]
-				})
-			}
-			setActions(actions);
-			});
-	}
-
-	const runSelectedAction = () => {
-		
-		fetch(config.baseApi+"/runSelectedAction?action="+selectedAction+"&security="+securityName+"&strategy="+selectedStrategy)
-		.then((response) => response.json())
-		.then((response) => {
-			//console.log('response', response);
-		});
-
-	}
 
 	const getSecurityData =  () => {
 		fetch(config.baseApi+"/prices?security="+securityName)
@@ -342,9 +309,9 @@ export const Container = (props) => {
 		<>
 			<MainCard>
 		 		<Grid container spacing={gridSpacing}>
-				 		<Grid item xs={12}  md={12} lg={12}>
+                        <Grid item xs={12}>
                             <Grid container alignItems="center" justifyContent="space-between">
-                                <Grid item xs={6}  md={6} lg={6}>
+                                <Grid item>
                                 {featuredStrategy ? <Grid container spacing={1}>
                                         <Grid item>
                                             <Typography variant="subtitle2">Profit</Typography>
@@ -366,50 +333,21 @@ export const Container = (props) => {
                                         </Grid>		
                                     </Grid> : null}
                                 </Grid>
-
-								{/* <Grid item xs={1}  md={1} lg={1}>
-								</Grid> */}
-					
-                                <Grid item  xs={6}  md={6} lg={6} alignContent="right">
-									<Grid container alignItems="center" spacing={1}>
-										<Grid item  xs={1}  md={1} lg={1}>
-											<Typography variant="subtitle2" >Actions</Typography>
-										</Grid>
-										<Grid item  xs={5}  md={5} lg={5} alignSelf="auto">
-											<TextField  
-													id="action-select"
-													select
-													value={selectedAction}
-													onChange={(e) => setSelectedAction(e.target.value)}
-													disabled={disableActionSelect}
-												>
-													{actions ?  actions.map((option) => (
-														<MenuItem key={option.value} value={option.value}>
-															{option.label}
-														</MenuItem>
-													)): null}
-											</TextField> 
-										</Grid>
-										<Grid item  xs={1}  md={1} lg={1}>
-											<Typography variant="subtitle2" >Strategy</Typography>
-										</Grid>
-										<Grid item  xs={5}  md={5} lg={5}>
-											<TextField  
-													id="strategies-select"
-													select
-													value={selectedStrategy}
-													onChange={(e) => setSelectedStrategy(e.target.value)}
-													disabled={disableStrategySelect}
-												>
-													{strategies ?  strategies.map((option) => (
-														<MenuItem key={option.value} value={option.value}>
-															{option.label}
-														</MenuItem>
-													)): null}
-											</TextField> 
-										</Grid>
-									</Grid>
-								</Grid>
+                                <Grid item>
+                                 <TextField
+                                        id="strategies-select"
+                                        select
+                                        value={selectedStrategy}
+                                        onChange={(e) => setSelectedStrategy(e.target.value)}
+										disabled={disableStrategySelect}
+                                    >
+                                        {strategies ?  strategies.map((option) => (
+                                            <MenuItem key={option.value} value={option.value}>
+                                                {option.label}
+                                            </MenuItem>
+                                        )): null}
+                                    </TextField>
+                                </Grid>
                             </Grid>
                         </Grid>
 						<Grid item id="legend">
