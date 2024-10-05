@@ -6,7 +6,8 @@ const config = {
     fontFamily: `'Roboto', sans-serif`,
     borderRadius: 12,
     //baseApi: 'http://localhost:8080',
-    baseApi: 'http://172.232.152.62:8080',
+    //baseApi: 'http://172.232.152.62:8080',
+    baseApi: 'http://172.232.147.127:8080',
 };
 
 export default config;
