@@ -180,7 +180,7 @@ const StrategiesCard = ({featuredStrategies}) => {
     renderDetailPanel:({ row }) => (
       <Grid container spacing={gridSpacing}>
         <Grid item xs={11}>  
-          { row.getIsExpanded() ? <Container securityName={row.original.securityName} initSelectedStrategy={row.original.name+'Strategy'} disableStrategySelect={true}/>: null}    
+          { row.getIsExpanded() ? <Container securityName={row.original.securityName} securityDesc={row.original.securityDesc} initSelectedStrategy={row.original.name+'Strategy'} disableStrategySelect={true}/>: null}    
         </Grid>
       </Grid>
     ),

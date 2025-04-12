@@ -14,9 +14,11 @@ import { gridSpacing } from 'store/constant';
 import EarningCard from './EarningCard';
 import TotalOrderLineChartCard from './TotalOrderLineChartCard';
 import TotalIncomeDarkCard from './TotalIncomeDarkCard';
+import TotalIncomeLightCard from './TotalIncomeLightCard';
 import TotalTradingCard2 from './TotalTradingCard2';
 import PopularCard from './PopularCard';
 import ClosedSmartSignalsCard from './ClosedSmartSignalsCard';
+import { Container } from '../../../ui-component/frosk/cards/Container';
 
 // ==============================|| DEFAULT DASHBOARD ||============================== //
 
@@ -28,15 +30,10 @@ const Dashboard = () => {
 
     return (
         <Grid container spacing={gridSpacing}>
-            {/* <Grid item xs={12}>
+
+            <Grid item xs={12}>
                 <Grid container spacing={gridSpacing}>
-                    <Grid item lg={6} md={6} sm={6} xs={12}>
-                        <EarningCard isLoading={isLoading} />
-                    </Grid>
-                    <Grid item lg={6} md={6} sm={6} xs={12}>
-                        <TotalOrderLineChartCard isLoading={isLoading} />
-                    </Grid>
-                    <Grid item lg={4} md={12} sm={12} xs={12}>
+                    {/* <Grid item lg={4} md={12} sm={12} xs={12}>
                         <Grid container spacing={gridSpacing}>
                             <Grid item sm={6} xs={12} md={6} lg={12}>
                                 <TotalIncomeDarkCard isLoading={isLoading} />
@@ -48,15 +45,12 @@ const Dashboard = () => {
                     </Grid>
                     <Grid item xs={12} sx={{ pt: '16px !important' }}>
                         <StrategyPerformanceChartCard />
-                    </Grid>
+                    </Grid> */}
                 </Grid>
-            </Grid> */}
+            </Grid>
 
             <Grid item xs={12}>
             <Grid container spacing={gridSpacing}>
-                    <Grid item sm={12} xs={12} md={12} lg={12}>
-                        <TotalTradingCard2 isLoading={isLoading} />
-                    </Grid>
                     <Grid item sm={12} xs={12} md={12} lg={12}>
                        <TopFeaturedStrategyCard isLoading={isLoading} />   
                     </Grid>
@@ -79,12 +73,15 @@ const Dashboard = () => {
                     <Grid item lg={12} md={12} sm={12} xs={12}>
                         <OpenSignalsCard isLoading={isLoading} />
                     </Grid>   
+                    <Grid item sm={12} xs={12} md={12} lg={12}>
+                        <TotalTradingCard2 isLoading={isLoading} />
+                    </Grid>
                     {/* <Grid item lg={12} md={12} sm={12} xs={12}>
                         <TopStrategyPerformanceBarChart isLoading={isLoading} />
                     </Grid>                    
                     <Grid item lg={12} md={12} sm={12} xs={12}>
                         <TopStrategyPerformanceQualityBarChart isLoading={isLoading} />
-                    </Grid>                     */}
+                    </Grid> */}
                 </Grid>
             </Grid>
         </Grid>

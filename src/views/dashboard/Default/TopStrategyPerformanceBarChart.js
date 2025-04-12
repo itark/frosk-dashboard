@@ -127,11 +127,6 @@ const TopStrategyPerformanceBarChart = ({ isLoading }) => {
                                 </List>
                             </Box>
 
-
-
-
-
-
                         </CardWrapper>
                     </Grid>
                     <Grid item xs={12}>

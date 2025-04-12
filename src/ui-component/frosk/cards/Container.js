@@ -33,7 +33,7 @@ const Context = createContext();
 
 export const Container = (props) => {
 	const theme = useTheme();
-	const { securityName, initSelectedStrategy, disableStrategySelect} = props;
+	const { securityName, securityDesc, initSelectedStrategy, disableStrategySelect} = props;
 	const [selectedStrategy, setSelectedStrategy] = useState(initSelectedStrategy);
 	const [featuredStrategy, setFeaturedStrategy] = useState();
 	const [strategies, setStrategies] = useState();
@@ -106,8 +106,8 @@ export const Container = (props) => {
 
 
 	const getSecurityData =  () => {
-		fetch(config.baseApi+"/prices?security="+securityName)
-		  .then((response) => response.json())
+		fetch(`${config.baseApi}/prices?security=${encodeURIComponent(securityName)}`)
+		.then((response) => response.json())
 		  .then((response) => {
 			candleSeries.current.setData(response);
 			volumeSeries.current.setData(response);
@@ -115,8 +115,10 @@ export const Container = (props) => {
 	  };
 
 	const getFeaturedStrategy =  () => {
-		fetch(config.baseApi+"/featuredStrategy?security="+securityName+"&strategy="+selectedStrategy)
-		  .then((response) => response.json())
+		fetch(
+			`${config.baseApi}/featuredStrategy?security=${encodeURIComponent(securityName)}&strategy=${encodeURIComponent(selectedStrategy)}`
+		  )
+		.then((response) => response.json())
 		  .then((response) => {
 			console.log('response',response)
 			setShortEma(response);
@@ -180,7 +182,7 @@ export const Container = (props) => {
 				value: datapoint.value,
 				name: datapoint.name
 		}));
-		if (cel) console.log('cel values',cel.length)
+		//if (cel) console.log('cel values',cel.length)
 		celSeries.current.setData(cel);
 	}
 
@@ -281,7 +283,7 @@ export const Container = (props) => {
 		for (let i = 0; i < trades.length; i++) {
 			if (trades[i].type === 'SELL') {
 				markers.push({
-					time: trades[i].dateReadable,
+					time: Math.floor(new Date(trades[i].dateReadable).getTime() / 1000),
 					position: 'aboveBar',
 					color: '#e91e63',
 					shape: 'arrowDown',
@@ -289,7 +291,7 @@ export const Container = (props) => {
 				});
 			} else if (trades[i].type === 'BUY') {
 				markers.push({
-					time: trades[i].dateReadable,
+					time: Math.floor(new Date(trades[i].dateReadable).getTime() / 1000),
 					position: 'belowBar',
 					color: '#2196F3',
 					shape: 'arrowUp',
@@ -299,8 +301,6 @@ export const Container = (props) => {
 				console.error('trades[i].type',trades[i].type)
 			}
 		}
-		//if (markers) console.log('markers values',markers.length)
-		//if (markers) console.log('response.trades',response.trades)		
 		markers = markers.sort((a,b) => (a.time - b.time));
 		candleSeries.current.setMarkers(markers);
 	}
@@ -308,30 +308,15 @@ export const Container = (props) => {
 	return (
 		<>
 			<MainCard>
-		 		<Grid container spacing={gridSpacing}>
-                        <Grid item xs={12}>
+		 		<Grid container spacing={gridSpacing} lg={12}  md={12} xs={12}>
+                        <Grid item lg={12}  md={12} xs={12}>
                             <Grid container alignItems="center" justifyContent="space-between">
                                 <Grid item>
-                                {featuredStrategy ? <Grid container spacing={1}>
-                                        <Grid item>
-                                            <Typography variant="subtitle2">Profit</Typography>
-                                        </Grid>
-                                        <Grid item>
-                                            <Typography variant="h3">{featuredStrategy.totalProfit}%</Typography>
-                                        </Grid>
-										<Grid item>
-                                            <Typography variant="subtitle2">SQN</Typography>
-                                        </Grid>
-                                        <Grid item>
-                                            <Typography variant="h3">{featuredStrategy.sqn}</Typography>
-                                        </Grid>
-										<Grid item>
-                                            <Typography variant="subtitle2">Return in EUR</Typography>
-                                        </Grid>
-                                        <Grid item>
-                                            <Typography variant="h3">{featuredStrategy.totalGrossReturn} EUR</Typography>
-                                        </Grid>		
-                                    </Grid> : null}
+								{featuredStrategy ? (
+									<Typography variant="h5" sx={{ whiteSpace: 'nowrap' }}>
+      									{securityDesc}, {featuredStrategy.totalProfit}%
+    								</Typography>
+								) : null}
                                 </Grid>
                                 <Grid item>
                                  <TextField
@@ -431,8 +416,8 @@ export const Container = (props) => {
 								/>
 							</Chart>
                         </Grid>
-
-                        {featuredStrategy ? <Grid item xs={12}>  
+                        {featuredStrategy ? 
+						<Grid item xs={12}>  
                           <Typography variant="h5">{featuredStrategy.numberofTrades} Trades on {featuredStrategy.name} | {featuredStrategy.securityName} </Typography>
                           <ExpandMore
                               expand={expanded}
@@ -464,9 +449,6 @@ export function Chart(props) {
 
 export const ChartContainer = forwardRef((props, ref) => {
 	const { children, container, layout, ...rest } = props;
-
-	console.log('container',container);
-
 	const { securityName } = props;
 	const chartApiRef = useRef({
 		api() {
@@ -613,7 +595,6 @@ export const Candles = forwardRef((props, ref) => {
 			if (document.getElementById("legend") !== null) {
 				document.getElementById("legend").innerHTML = `Open:<strong>${open}</strong> High:<strong>${high}</strong> Low:<strong>${low}</strong> Close:<strong>${close}</strong>`;
 			}
-
 		});
 	});
 

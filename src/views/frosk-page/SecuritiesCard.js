@@ -62,6 +62,7 @@ const SecuritiesCard = ( {securities}) => {
   );
 
   const [security, setSecurity] = useState();
+  const [securityDesc, setSecurityDesc] = useState();
   const [data, setData] = useState([]);
   const [initSelectedStrategy, setInitSelectedStrategy] = useState();
   const [sorting, setSorting] = useState([]);
@@ -95,6 +96,7 @@ const SecuritiesCard = ( {securities}) => {
     muiTableBodyRowProps: ({ row }) => ({
       onClick: (event) => {
         setSecurity(row.original.name);
+        setSecurityDesc(row.original.desc);
         setInitSelectedStrategy(row.original.bestStrategy)
       },
       sx: {
@@ -129,7 +131,7 @@ const SecuritiesCard = ( {securities}) => {
               <MaterialReactTable table={table} />
             </Grid>
             <Grid item xs={10}  md={10} lg={10} sx={{ pt: '16px !important' }}>
-              {security ? <Container securityName={security} initSelectedStrategy={initSelectedStrategy} disableStrategySelect={false} /> : null}
+              {security ? <Container securityName={security} securityDesc={securityDesc} initSelectedStrategy={initSelectedStrategy} disableStrategySelect={false} /> : null}
             </Grid>
       </Grid>
   ;
