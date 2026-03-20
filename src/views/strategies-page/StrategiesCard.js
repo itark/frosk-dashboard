@@ -27,7 +27,7 @@ import {
 import { AccountCircle, Send } from '@mui/icons-material';
 
 const StrategiesCard = ({featuredStrategies}) => {
-  console.log('featuredStrategies',featuredStrategies);
+  //console.log('featuredStrategies',featuredStrategies);
   const [data, setData] = useState([]);
 
   useEffect(() => {
@@ -53,6 +53,10 @@ const StrategiesCard = ({featuredStrategies}) => {
     window.open('https://www.coinbase.com/advanced-trade/'+securityName, '_blank');
   }
 
+  const openYahoo = (securityName) => {
+    window.open('https://finance.yahoo.com/chart/'+securityName, '_blank');
+  }
+
   const columns = useMemo(
     () => [
         {
@@ -73,11 +77,11 @@ const StrategiesCard = ({featuredStrategies}) => {
                 gap: '1rem',
               }}
             >
-            <ReactImageFallback
+            {/* <ReactImageFallback
                 src={row.original.icon}
                 fallbackImage={generic}
                 initialImage={generic}
-            />
+            /> */}
               {/* using renderedCellValue instead of cell.getValue() preserves filter match highlighting */}
               <span>{renderedCellValue}</span>
             </Box>
@@ -93,15 +97,15 @@ const StrategiesCard = ({featuredStrategies}) => {
             <ColumnBox cell={cell}></ColumnBox>  
           },
           {
-            accessorKey: 'sqn',
-            header: 'SQN',
-            size: 2,
+            accessorKey: 'latestTrade',
+            header: 'Latest',
+            size: 20,
           }, 
           {
-            accessorKey: 'expectancy',
-            header: 'Exp',
+            accessorKey: 'isOpen',
+            header: 'Open',
             size: 2,
-          },
+          },  
           {
             accessorKey: 'profitableTradesRatio',
             header: 'Win ratio',
@@ -149,20 +153,21 @@ const StrategiesCard = ({featuredStrategies}) => {
             },  
           }, 
           {
+            accessorKey: 'sqn',
+            header: 'SQN',
+            size: 2,
+          }, 
+          {
+            accessorKey: 'expectancy',
+            header: 'Exp',
+            size: 2,
+          },
+          {
             accessorKey: 'period',
             header: 'Period',
             size: 50,
           },
-          {
-            accessorKey: 'latestTrade',
-            header: 'Latest',
-            size: 20,
-          }, 
-          {
-            accessorKey: 'isOpen',
-            header: 'Open',
-            size: 2,
-          },   
+
     ],
     [],
   );
@@ -174,13 +179,21 @@ const StrategiesCard = ({featuredStrategies}) => {
     enableGrouping: true,
     enableRowActions: true,
     enableExpandAll: false,
-    enablePagination: false,
-    initialState: { showColumnFilters: true, sorting: [{ id: 'totalProfit', desc: true },{ id: 'sqn', desc: true }],},
+    enablePagination: true,
+    // Pagination settings
+    initialState: { 
+      showColumnFilters: true, 
+      sorting: [
+        { id: 'totalProfit', desc: true },
+        { id: 'sqn', desc: true }
+      ],
+      pagination: { pageIndex: 0, pageSize: 100 } // Start with reasonable page size
+    },
     //muiTableContainerProps: { sx: { height: '80%', width: '100%' } },
     renderDetailPanel:({ row }) => (
       <Grid container spacing={gridSpacing}>
-        <Grid item xs={11}>  
-          { row.getIsExpanded() ? <Container securityName={row.original.securityName} securityDesc={row.original.securityDesc} initSelectedStrategy={row.original.name+'Strategy'} disableStrategySelect={true}/>: null}    
+        <Grid item xs={11}>
+          { row.getIsExpanded() ?  <Container securityName={row.original.securityName} initSelectedStrategy={row.original.name+'Strategy'} disableStrategySelect={false}/>: null}    
         </Grid>
       </Grid>
     ),
@@ -209,6 +222,18 @@ const StrategiesCard = ({featuredStrategies}) => {
         </ListItemIcon>
         View Coinbase
       </MenuItem>,
+      <MenuItem
+      key={2}
+      onClick={() => {
+        openYahoo(row.original.securityName);
+        }}
+      sx={{ m: 0 }}
+    >
+      <ListItemIcon>
+        <Send />
+      </ListItemIcon>
+      View Yahoo Finance
+    </MenuItem>,      
     ],                                    
     renderTopToolbar: ({ table }) => {
       return (

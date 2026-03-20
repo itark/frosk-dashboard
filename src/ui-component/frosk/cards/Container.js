@@ -18,7 +18,8 @@ import {
 	Grid,
 	Typography,
 	Collapse,
-	IconButton
+	IconButton,
+	Box
   } from '@mui/material';
 
 import { styled } from '@mui/material/styles';
@@ -33,16 +34,16 @@ const Context = createContext();
 
 export const Container = (props) => {
 	const theme = useTheme();
-	const { securityName, securityDesc, initSelectedStrategy, disableStrategySelect} = props;
+	const { securityName, initSelectedStrategy, disableStrategySelect} = props;
 	const [selectedStrategy, setSelectedStrategy] = useState(initSelectedStrategy);
 	const [featuredStrategy, setFeaturedStrategy] = useState();
 	const [strategies, setStrategies] = useState();
+	const [security, setSecurity] = useState();
 	const [expanded, setExpanded] = useState(false);
     const blue = '#2962FF';
 	const orange = '#e69138';
 	const red = '#be4d25';
 	const [chartLayoutOptions, setChartLayoutOptions] = useState({});
-	var markers = [];
 	const candleSeries = useRef(null);
 	const volumeSeries = useRef(null);
 	const shortEmaSeries = useRef(null);
@@ -59,6 +60,10 @@ export const Container = (props) => {
 	const longCciSeries = useRef(null);
 	const shortCciSeries = useRef(null);
 
+
+	console.log('Container securityName',securityName);
+	console.log('Container security',security);
+
 	useEffect(() => {
 		getStrategies();
 		setSelectedStrategy(initSelectedStrategy);
@@ -67,7 +72,9 @@ export const Container = (props) => {
 	}, [initSelectedStrategy]);
 
 	useEffect(() => {
+		getSecurity();
 		getSecurityData();
+		getFeaturedStrategy();
 	}, [securityName]);
 
 	useEffect(() => {
@@ -104,6 +111,14 @@ export const Container = (props) => {
 		  });
 	  }
 
+	const getSecurity =  () => {
+		fetch(`${config.baseApi}/security?name=${encodeURIComponent(securityName)}`)
+		.then((response) => response.json())
+		  .then((response) => {
+			setSecurity(response);
+		  });
+	  };
+
 
 	const getSecurityData =  () => {
 		fetch(`${config.baseApi}/prices?security=${encodeURIComponent(securityName)}`)
@@ -129,7 +144,7 @@ export const Container = (props) => {
 			setEmaMacd(response);
 			setAdx(response);
 			setPlusDI(response);
-			setMinusDI(response);
+			setMinusDI(response); 
 			setLongCci(response);				
 			setShortCci(response);	
 
@@ -140,31 +155,31 @@ export const Container = (props) => {
 
 	const setShortEma =  (response) => {
 		const shortEma = response.indicatorValues
-			.filter(o => o.name === 'shortEma')
+			.filter(o => o.name === 'shortEma' || o.name === 'sma10')
 			.map(datapoint => ({
 				time: datapoint.time,
 				value: datapoint.value,
 				name: datapoint.name
 		}));
-		//if (shortEma) console.log('shortEma values',shortEma.length)
+		if (shortEma) console.log('shortEma values',shortEma.length)
 		shortEmaSeries.current.setData(shortEma);
 	}
 
 	const setLongEma =  (response) => {
 		const longEma = response.indicatorValues
-			.filter(o => o.name === 'longEma')
+			.filter(o => o.name === 'longEma' || o.name === 'sma20')
 			.map(datapoint => ({
 				time: datapoint.time,
 				value: datapoint.value,
 				name: datapoint.name
 		}));
-		//if (longEma) console.log('longEma values',longEma.length)
+		if (longEma) console.log('longEma values',longEma.length)
 		longEmaSeries.current.setData(longEma);
 	}
 
 	const setParabolicSar =  (response) => {
 		const pSar = response.indicatorValues
-			.filter(o => o.name === 'pSar')
+			.filter(o => o.name === 'pSar' || o.name === 'sma50')
 			.map(datapoint => ({
 				time: datapoint.time,
 				value: datapoint.value,
@@ -176,13 +191,13 @@ export const Container = (props) => {
 
 	const setCel =  (response) => {
 		const cel = response.indicatorValues
-			.filter(o => o.name === 'cel')
+			.filter(o => o.name === 'cel' || o.name === 'sma100')
 			.map(datapoint => ({
 				time: datapoint.time,
 				value: datapoint.value,
 				name: datapoint.name
 		}));
-		//if (cel) console.log('cel values',cel.length)
+		if (cel) console.log('cel values',cel.length)
 		celSeries.current.setData(cel);
 	}
 
@@ -271,6 +286,7 @@ export const Container = (props) => {
 	}	
 
 	const setMarkers =  (response) => {
+		let markers = [];
 		let trades = [];
 		if (response.trades) {
 			trades = response.trades
@@ -308,16 +324,70 @@ export const Container = (props) => {
 	return (
 		<>
 			<MainCard>
-		 		<Grid container spacing={gridSpacing} lg={12}  md={12} xs={12}>
+		 		<Grid container spacing={gridSpacing}>
                         <Grid item lg={12}  md={12} xs={12}>
                             <Grid container alignItems="center" justifyContent="space-between">
-                                <Grid item>
-								{featuredStrategy ? (
+                               <Grid item alignSelf={"flex-start"}>
+								{ (featuredStrategy && security)  ? (
 									<Typography variant="h5" sx={{ whiteSpace: 'nowrap' }}>
-      									{securityDesc}, {featuredStrategy.totalProfit}%
+										{security.desc},Profit: {featuredStrategy.totalProfit}% , Beta: {security.beta}, Revenue growth: {security.yoyGrowth}%, PEG Ratio: {security.pegRatio}
     								</Typography>
-								) : null}
-                                </Grid>
+								) : null}  	               
+                                </Grid>								
+								<Grid item>
+									<Box
+										component="button"
+										sx={{
+											ml: 2,
+											px: 2,
+											py: 1,
+											bgcolor: 'primary.main',
+											color: 'white',
+											border: 'none',
+											borderRadius: 1,
+											cursor: 'pointer',
+										}}
+										onClick={async () => {
+											try {
+ 												await fetch(`${config.baseApi}/runAction?action=LOAD_DATA&security=${encodeURIComponent(security.id)}&strategy=${encodeURIComponent(selectedStrategy)}`)
+												// refresh displayed data after backend update
+												getSecurityData();
+												getFeaturedStrategy();
+											} catch (err) {
+												console.error('Update request failed', err);
+											}
+										}}
+									>
+										Load data
+									</Box>
+								</Grid>
+								<Grid item>
+									<Box
+										component="button"
+										sx={{
+											ml: 2,
+											px: 2,
+											py: 1,
+											bgcolor: 'primary.main',
+											color: 'white',
+											border: 'none',
+											borderRadius: 1,
+											cursor: 'pointer',
+										}}
+										onClick={async () => {
+											try {
+ 												await fetch(`${config.baseApi}/runAction?action=RUN_STRATEGY&security=${encodeURIComponent(security.id)}&strategy=${encodeURIComponent(selectedStrategy)}`)
+												// refresh displayed data after backend update
+												getSecurityData();
+												getFeaturedStrategy();
+											} catch (err) {
+												console.error('Update request failed', err);
+											}
+										}}
+									>
+										Run strategy
+									</Box>
+								</Grid>
                                 <Grid item>
                                  <TextField
                                         id="strategies-select"
@@ -450,6 +520,10 @@ export function Chart(props) {
 export const ChartContainer = forwardRef((props, ref) => {
 	const { children, container, layout, ...rest } = props;
 	const { securityName } = props;
+
+	console.log('ChartContainer securityName',securityName);
+
+
 	const chartApiRef = useRef({
 		api() {
 			if (!this._api) {
@@ -494,16 +568,25 @@ export const ChartContainer = forwardRef((props, ref) => {
 		currentRef.api();
 	}, []);
 
-
 	useLayoutEffect(() => {
 		const currentRef = chartApiRef.current;
 		const chart = currentRef.api();
+	
+		function clickHandler() {
+			if (securityName && securityName.endsWith('.ST')) {
+				window.open('https://finance.yahoo.com/chart/'+securityName, '_blank');
+			} else if (securityName) {
+				window.open('https://www.coinbase.com/advanced-trade/'+securityName, '_blank');
+			}
+		}
+		
 		chart.subscribeClick(clickHandler);
-	}, []);
-
-	function clickHandler() {
-		window.open('https://www.coinbase.com/advanced-trade/'+securityName, '_blank');
-	}
+		
+		// Cleanup: unsubscribe the previous handler when securityName changes
+		return () => {
+			chart.unsubscribeClick(clickHandler);
+		};
+	}, [securityName]); // Add securityName as dependency
 
 	useLayoutEffect(() => {
 		const currentRef = chartApiRef.current;
@@ -532,7 +615,6 @@ export const ChartContainer = forwardRef((props, ref) => {
 		});
 	
 	  }, [securityName]);
-
 
 	return (
 		<Context.Provider value={chartApiRef.current}>

@@ -4,19 +4,30 @@ import {
   Grid,
   Box,
   lighten,
+  ListItemIcon,
+  MenuItem
 } from '@mui/material';
 import { Container } from '../../ui-component/frosk/cards/Container';
 import { gridSpacing } from 'store/constant';
+import config from 'config';
+
+//Icons Imports
+import { AccountCircle, Send } from '@mui/icons-material';
 
 const SecuritiesCard = ( {securities}) => {
-  console.log('securities',securities);
+
   const columns = useMemo(
     () => [
       {
         accessorKey: 'name',
-        header: 'Namn',
-        size: 50,
+        header: 'Ticker',
+        size: 20,
       },
+      {
+        accessorKey: 'desc',
+        header: 'Name',
+        size: 30,
+      },      
       // {
       //   accessorKey: 'bestStrategy',
       //   header: 'Best strategy',
@@ -61,8 +72,8 @@ const SecuritiesCard = ( {securities}) => {
     [],
   );
 
-  const [security, setSecurity] = useState();
-  const [securityDesc, setSecurityDesc] = useState();
+  const [securityName, setSecurityName] = useState();
+  const [securityId, setSecurityId] = useState();
   const [data, setData] = useState([]);
   const [initSelectedStrategy, setInitSelectedStrategy] = useState();
   const [sorting, setSorting] = useState([]);
@@ -74,14 +85,6 @@ const SecuritiesCard = ( {securities}) => {
     }
   }, [securities]);
 
-  // useEffect(() => {
-  //   //scroll to the top of the table when the sorting changes
-  //   try {
-  //     rowVirtualizerInstanceRef.current?.scrollToIndex?.(0);
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
-  // }, [sorting]);
 
   const table = useMaterialReactTable({
     columns,
@@ -95,8 +98,8 @@ const SecuritiesCard = ( {securities}) => {
     enableBottomToolbar: false,
     muiTableBodyRowProps: ({ row }) => ({
       onClick: (event) => {
-        setSecurity(row.original.name);
-        setSecurityDesc(row.original.desc);
+        setSecurityName(row.original.name);
+        setSecurityId(row.original.id);
         setInitSelectedStrategy(row.original.bestStrategy)
       },
       sx: {
@@ -123,7 +126,7 @@ const SecuritiesCard = ( {securities}) => {
           </Box>
         </Box>
       );
-    },
+    },                                  
   });  
   
   return <Grid container spacing={gridSpacing}>
@@ -131,7 +134,7 @@ const SecuritiesCard = ( {securities}) => {
               <MaterialReactTable table={table} />
             </Grid>
             <Grid item xs={10}  md={10} lg={10} sx={{ pt: '16px !important' }}>
-              {security ? <Container securityName={security} securityDesc={securityDesc} initSelectedStrategy={initSelectedStrategy} disableStrategySelect={false} /> : null}
+              {securityName ? <Container securityName={securityName} initSelectedStrategy={initSelectedStrategy} disableStrategySelect={false} /> : null}
             </Grid>
       </Grid>
   ;

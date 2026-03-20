@@ -29,6 +29,11 @@ export const OpenSignalsTable = ({openSignals}) => {
         header: 'Security',
         size: 2,
       },
+            {
+        accessorKey: 'securityDesc',
+        header: 'Description',
+        size: 2,
+      },
       {
         accessorKey: 'openPrice',
         header: 'Open price',

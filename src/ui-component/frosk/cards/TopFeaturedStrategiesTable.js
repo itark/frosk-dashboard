@@ -76,6 +76,7 @@ export const TopFeaturedStrategiesTable = ({topFeaturedStrategies}) => {
 
 
   const openStrategy = (row) => {
+    console.log('openStrategy row',row);
     navigateParam('/container-page', row);
   }
 

@@ -7,13 +7,11 @@ const ContainerPage = ( ) => {
     const location = useLocation();
     const initSelectedStrategy = location.state.name + 'Strategy';
     const securityName = location.state.securityName;
-
-    console.log('initSelectedStrategy',initSelectedStrategy)
-
+ 
     return (
         <Grid container spacing={gridSpacing}>
             <Grid item xs={12}>
-                <Container  securityName={securityName} initSelectedStrategy={initSelectedStrategy} disableStrategySelect={true}/>
+                <Container securityName={securityName} initSelectedStrategy={initSelectedStrategy} disableStrategySelect={false}/>
             </Grid>
         </Grid>
     )

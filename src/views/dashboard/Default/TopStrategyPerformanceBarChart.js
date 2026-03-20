@@ -65,8 +65,9 @@ const TopStrategyPerformanceBarChart = ({ isLoading }) => {
                     ...topData.options,
                     series: [{data}],
                 }   
-                ApexCharts.exec(`top-chart`, 'updateOptions', newChartData);
-        })
+               // ApexCharts.exec(`top-chart`, 'updateOptions', newChartData);
+               ApexCharts.exec('top-chart', 'updateSeries', [{ data }], true);
+            })
     }, []);
 
     return (

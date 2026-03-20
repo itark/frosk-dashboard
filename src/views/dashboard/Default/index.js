@@ -19,6 +19,7 @@ import TotalTradingCard2 from './TotalTradingCard2';
 import PopularCard from './PopularCard';
 import ClosedSmartSignalsCard from './ClosedSmartSignalsCard';
 import { Container } from '../../../ui-component/frosk/cards/Container';
+import StrategyPerformanceChart from './StrategyPerformanceChart';
 
 // ==============================|| DEFAULT DASHBOARD ||============================== //
 
@@ -30,7 +31,6 @@ const Dashboard = () => {
 
     return (
         <Grid container spacing={gridSpacing}>
-
             <Grid item xs={12}>
                 <Grid container spacing={gridSpacing}>
                     {/* <Grid item lg={4} md={12} sm={12} xs={12}>
@@ -76,10 +76,13 @@ const Dashboard = () => {
                     <Grid item sm={12} xs={12} md={12} lg={12}>
                         <TotalTradingCard2 isLoading={isLoading} />
                     </Grid>
+                    <Grid item lg={12} md={12} sm={12} xs={12}>
+                        <StrategyPerformanceChart />
+                    </Grid>  
                     {/* <Grid item lg={12} md={12} sm={12} xs={12}>
                         <TopStrategyPerformanceBarChart isLoading={isLoading} />
-                    </Grid>                    
-                    <Grid item lg={12} md={12} sm={12} xs={12}>
+                    </Grid>                     */}
+                    {/* <Grid item lg={12} md={12} sm={12} xs={12}>
                         <TopStrategyPerformanceQualityBarChart isLoading={isLoading} />
                     </Grid> */}
                 </Grid>
