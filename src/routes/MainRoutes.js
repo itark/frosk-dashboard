@@ -19,6 +19,7 @@ const FroskPage = Loadable(lazy(() => import('views/frosk-page')));
 const StrategiesPage = Loadable(lazy(() => import('views/strategies-page')));
 const ContainerPage = Loadable(lazy(() => import('views/container-page')));
 const IndexPage = Loadable(lazy(() => import('views/index-page')));
+const PortfolioPage = Loadable(lazy(() => import('views/portfolio-page')));
 
 // ==============================|| MAIN ROUTING ||============================== //
 
@@ -99,6 +100,10 @@ const MainRoutes = {
         {
             path: 'index-page',
             element: <IndexPage/>
+        },
+        {
+            path: 'portfolio-page',
+            element: <PortfolioPage />
         },       
     ]
 };

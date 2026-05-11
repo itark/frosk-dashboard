@@ -44,6 +44,7 @@ export const Container = (props) => {
 	const orange = '#e69138';
 	const red = '#be4d25';
 	const [chartLayoutOptions, setChartLayoutOptions] = useState({});
+	const isIntraday = selectedStrategy && selectedStrategy.toLowerCase().includes('intraday');
 	const candleSeries = useRef(null);
 	const volumeSeries = useRef(null);
 	const shortEmaSeries = useRef(null);
@@ -59,6 +60,10 @@ export const Container = (props) => {
 	const minusDISeries = useRef(null);
 	const longCciSeries = useRef(null);
 	const shortCciSeries = useRef(null);
+	const closeSeries = useRef(null);
+	const ema9Series = useRef(null);
+	const ema21Series = useRef(null);
+	const rsi7Series = useRef(null);
 
 
 	console.log('Container securityName',securityName);
@@ -78,6 +83,7 @@ export const Container = (props) => {
 	}, [securityName]);
 
 	useEffect(() => {
+		getSecurityData();
 		getFeaturedStrategy();
 	}, [selectedStrategy]);
 
@@ -120,12 +126,23 @@ export const Container = (props) => {
 	  };
 
 
+	const toUnixTimestamp = (item) => ({
+		...item,
+		time: Math.floor(new Date(item.time).getTime() / 1000),
+	});
+
+	const mapTime = (t) => isIntraday ? Math.floor(new Date(t).getTime() / 1000) : t;
+
 	const getSecurityData =  () => {
-		fetch(`${config.baseApi}/prices?security=${encodeURIComponent(securityName)}`)
+		const endpoint = isIntraday
+			? '/intradayPrices'
+			: '/prices';
+		fetch(`${config.baseApi}${endpoint}?security=${encodeURIComponent(securityName)}`)
 		.then((response) => response.json())
 		  .then((response) => {
-			candleSeries.current.setData(response);
-			volumeSeries.current.setData(response);
+			const data = isIntraday ? response.map(toUnixTimestamp) : response;
+			candleSeries.current.setData(data);
+			volumeSeries.current.setData(data);
 		  });
 	  };
 
@@ -145,8 +162,12 @@ export const Container = (props) => {
 			setAdx(response);
 			setPlusDI(response);
 			setMinusDI(response); 
-			setLongCci(response);				
-			setShortCci(response);	
+			setLongCci(response);
+			setShortCci(response);
+			setClose(response);
+			setEma9(response);
+			setEma21(response);
+			setRsi7(response);
 
 			setMarkers(response);
 			setFeaturedStrategy(response);
@@ -157,7 +178,7 @@ export const Container = (props) => {
 		const shortEma = response.indicatorValues
 			.filter(o => o.name === 'shortEma' || o.name === 'sma10')
 			.map(datapoint => ({
-				time: datapoint.time,
+				time: mapTime(datapoint.time),
 				value: datapoint.value,
 				name: datapoint.name
 		}));
@@ -169,7 +190,7 @@ export const Container = (props) => {
 		const longEma = response.indicatorValues
 			.filter(o => o.name === 'longEma' || o.name === 'sma20')
 			.map(datapoint => ({
-				time: datapoint.time,
+				time: mapTime(datapoint.time),
 				value: datapoint.value,
 				name: datapoint.name
 		}));
@@ -181,7 +202,7 @@ export const Container = (props) => {
 		const pSar = response.indicatorValues
 			.filter(o => o.name === 'pSar' || o.name === 'sma50')
 			.map(datapoint => ({
-				time: datapoint.time,
+				time: mapTime(datapoint.time),
 				value: datapoint.value,
 				name: datapoint.name
 		}));
@@ -193,7 +214,7 @@ export const Container = (props) => {
 		const cel = response.indicatorValues
 			.filter(o => o.name === 'cel' || o.name === 'sma100')
 			.map(datapoint => ({
-				time: datapoint.time,
+				time: mapTime(datapoint.time),
 				value: datapoint.value,
 				name: datapoint.name
 		}));
@@ -205,7 +226,7 @@ export const Container = (props) => {
 		const macd = response.indicatorValues
 			.filter(o => o.name === 'macd')
 			.map(datapoint => ({
-				time: datapoint.time,
+				time: mapTime(datapoint.time),
 				value: datapoint.value,
 				name: datapoint.name
 		}));
@@ -217,7 +238,7 @@ export const Container = (props) => {
 		const emaMacd = response.indicatorValues
 			.filter(o => o.name === 'emaMacd')
 			.map(datapoint => ({
-				time: datapoint.time,
+				time: mapTime(datapoint.time),
 				value: datapoint.value,
 				name: datapoint.name
 		}));
@@ -229,7 +250,7 @@ export const Container = (props) => {
 		const adx = response.indicatorValues
 			.filter(o => o.name === 'adx')
 			.map(datapoint => ({
-				time: datapoint.time,
+				time: mapTime(datapoint.time),
 				value: datapoint.value,
 				name: datapoint.name
 		}));
@@ -241,7 +262,7 @@ export const Container = (props) => {
 		const plusDI = response.indicatorValues
 			.filter(o => o.name === 'plusDI')
 			.map(datapoint => ({
-				time: datapoint.time,
+				time: mapTime(datapoint.time),
 				value: datapoint.value,
 				name: datapoint.name
 		}));
@@ -253,7 +274,7 @@ export const Container = (props) => {
 		const minusDI = response.indicatorValues
 			.filter(o => o.name === 'minusDI')
 			.map(datapoint => ({
-				time: datapoint.time,
+				time: mapTime(datapoint.time),
 				value: datapoint.value,
 				name: datapoint.name
 		}));
@@ -265,7 +286,7 @@ export const Container = (props) => {
 		const longCci = response.indicatorValues
 			.filter(o => o.name === 'longCci')
 			.map(datapoint => ({
-				time: datapoint.time,
+				time: mapTime(datapoint.time),
 				value: datapoint.value,
 				name: datapoint.name
 		}));
@@ -277,13 +298,57 @@ export const Container = (props) => {
 		const shortCci = response.indicatorValues
 			.filter(o => o.name === 'shortCci')
 			.map(datapoint => ({
-				time: datapoint.time,
+				time: mapTime(datapoint.time),
 				value: datapoint.value,
 				name: datapoint.name
 		}));
 		//if (shortCci) console.log('shortCci values',shortCci.length)	
 		shortCciSeries.current.setData(shortCci);
-	}	
+	}
+
+	const setClose =  (response) => {
+		const close = response.indicatorValues
+			.filter(o => o.name === 'close')
+			.map(datapoint => ({
+				time: mapTime(datapoint.time),
+				value: datapoint.value,
+				name: datapoint.name
+		}));
+		closeSeries.current.setData(close);
+	}
+
+	const setEma9 =  (response) => {
+		const ema9 = response.indicatorValues
+			.filter(o => o.name === 'ema9')
+			.map(datapoint => ({
+				time: mapTime(datapoint.time),
+				value: datapoint.value,
+				name: datapoint.name
+		}));
+		ema9Series.current.setData(ema9);
+	}
+
+	const setEma21 =  (response) => {
+		const ema21 = response.indicatorValues
+			.filter(o => o.name === 'ema21')
+			.map(datapoint => ({
+				time: mapTime(datapoint.time),
+				value: datapoint.value,
+				name: datapoint.name
+		}));
+		ema21Series.current.setData(ema21);
+	}
+
+	const setRsi7 =  (response) => {
+		const rsi7 = response.indicatorValues
+			.filter(o => o.name === 'rsi7')
+			.map(datapoint => ({
+				time: mapTime(datapoint.time),
+				value: datapoint.value,
+				name: datapoint.name
+		}));
+		rsi7Series.current.setData(rsi7);
+	}
 
 	const setMarkers =  (response) => {
 		let markers = [];
@@ -408,11 +473,12 @@ export const Container = (props) => {
 						<Grid item id="legend">
                         </Grid>	
                         <Grid item xs={12}>
-							<Chart layout={chartLayoutOptions} securityName={securityName}>
+							<Chart layout={chartLayoutOptions} securityName={securityName} isIntraday={isIntraday}>
 								<Candles
 									type={'candles'}
 									ref={candleSeries}
 									color={blue}
+									isIntraday={isIntraday}
 								/>
 								<Volumes
 									type={'histogram'}
@@ -484,8 +550,32 @@ export const Container = (props) => {
 									ref={shortCciSeries}
 									color={blue}
 								/>
+								<Line
+									type={'close'}
+									ref={closeSeries}
+									color={theme.palette.grey[500]}
+								/>
+								<Line
+									type={'ema9'}
+									ref={ema9Series}
+									color={orange}
+								/>
+								<Line
+									type={'ema21'}
+									ref={ema21Series}
+									color={blue}
+								/>
 							</Chart>
                         </Grid>
+						<Grid item xs={12}>
+							<Chart layout={chartLayoutOptions} securityName={securityName} isIntraday={isIntraday} height={200}>
+								<Line
+									type={'rsi7'}
+									ref={rsi7Series}
+									color={theme.palette.success.dark}
+								/>
+							</Chart>
+						</Grid>
                         {featuredStrategy ? 
 						<Grid item xs={12}>  
                           <Typography variant="h5">{featuredStrategy.numberofTrades} Trades on {featuredStrategy.name} | {featuredStrategy.securityName} </Typography>
@@ -518,7 +608,7 @@ export function Chart(props) {
 }
 
 export const ChartContainer = forwardRef((props, ref) => {
-	const { children, container, layout, ...rest } = props;
+	const { children, container, layout, isIntraday, height = 600, ...rest } = props;
 	const { securityName } = props;
 
 	console.log('ChartContainer securityName',securityName);
@@ -531,7 +621,11 @@ export const ChartContainer = forwardRef((props, ref) => {
 					...rest,
 					layout,
 					width: container.clientWidth,
-					height: 600,
+					height,
+					timeScale: {
+						timeVisible: !!isIntraday,
+						secondsVisible: false,
+					},
 				});
 				this._api.timeScale().fitContent();
 			}
@@ -602,6 +696,16 @@ export const ChartContainer = forwardRef((props, ref) => {
 
 	useEffect(() => {
 		const currentRef = chartApiRef.current;
+		currentRef.api().applyOptions({
+			timeScale: {
+				timeVisible: !!isIntraday,
+				secondsVisible: false,
+			},
+		});
+	}, [isIntraday]);
+
+	useEffect(() => {
+		const currentRef = chartApiRef.current;
 	
 		currentRef.api().applyOptions({
 		  watermark: {
@@ -667,15 +771,26 @@ export const Candles = forwardRef((props, ref) => {
 
 		parent.api().subscribeCrosshairMove(param => {
 			let open, high, low, close = '';
+			let timeLabel = '';
 			if (param.time) {
 				const price = param.seriesPrices.get(currentRef.candles());
 				open = price.open;
 				high = price.high;
 				low = price.low;
 				close = price.close;
+				if (props.isIntraday && typeof param.time === 'number') {
+					const d = new Date(param.time * 1000);
+					const yyyy = d.getFullYear();
+					const mm = String(d.getMonth() + 1).padStart(2, '0');
+					const dd = String(d.getDate()).padStart(2, '0');
+					const hh = String(d.getHours()).padStart(2, '0');
+					const min = String(d.getMinutes()).padStart(2, '0');
+					timeLabel = `${yyyy}-${mm}-${dd} ${hh}:${min}`;
+				}
 			}
 			if (document.getElementById("legend") !== null) {
-				document.getElementById("legend").innerHTML = `Open:<strong>${open}</strong> High:<strong>${high}</strong> Low:<strong>${low}</strong> Close:<strong>${close}</strong>`;
+				const timePart = timeLabel ? `Time:<strong>${timeLabel}</strong> ` : '';
+				document.getElementById("legend").innerHTML = `${timePart}Open:<strong>${open}</strong> High:<strong>${high}</strong> Low:<strong>${low}</strong> Close:<strong>${close}</strong>`;
 			}
 		});
 	});
