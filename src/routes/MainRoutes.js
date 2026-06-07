@@ -20,6 +20,7 @@ const StrategiesPage = Loadable(lazy(() => import('views/strategies-page')));
 const ContainerPage = Loadable(lazy(() => import('views/container-page')));
 const IndexPage = Loadable(lazy(() => import('views/index-page')));
 const PortfolioPage = Loadable(lazy(() => import('views/portfolio-page')));
+const IntradayStrategiesPage = Loadable(lazy(() => import('views/intraday-strategies-page')));
 
 // ==============================|| MAIN ROUTING ||============================== //
 
@@ -104,7 +105,11 @@ const MainRoutes = {
         {
             path: 'portfolio-page',
             element: <PortfolioPage />
-        },       
+        },
+        {
+            path: 'intraday-strategies-page',
+            element: <IntradayStrategiesPage />
+        },
     ]
 };
 

@@ -2,7 +2,7 @@ import React, { useMemo, useEffect, useState  } from 'react';
 import  { MaterialReactTable, useMaterialReactTable } from 'material-react-table';
 import ColumnBox from '../ColumnBox';
 
-export const TradesTable = ({trades}) => {
+export const TradesTable = ({trades, isIntraday}) => {
   const [data, setData] = useState([]);
   const columns = useMemo(
     () => [
@@ -10,12 +10,17 @@ export const TradesTable = ({trades}) => {
         accessorKey: 'dateReadable',
         header: 'Date',
         size: 10,
-      },   
+      },
+      ...(isIntraday ? [{
+        accessorKey: 'date',
+        header: 'DateTime',
+        size: 15,
+      }] : []),
       {
         accessorKey: 'type',
         header: 'Type',
         size: 10,
-      }, 
+      },
       {
         accessorKey: 'price',
         header: 'Price',
@@ -25,21 +30,21 @@ export const TradesTable = ({trades}) => {
         accessorKey: 'amount',
         header: 'Amount',
         size: 5,
-      },   
+      },
       {
         accessorKey: 'grossProfit',
         header: 'Profit',
         size: 10,
-      },  
+      },
       {
         accessorKey: 'pnl',
         header: 'P/L',
         size: 10,
         Cell: ({ cell }) =>
-        <ColumnBox cell={cell}></ColumnBox>          
-      },       
+        <ColumnBox cell={cell}></ColumnBox>
+      },
     ],
-    [],
+    [isIntraday],
   );
 
   useEffect(() => {

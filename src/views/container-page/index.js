@@ -7,7 +7,7 @@ const ContainerPage = ( ) => {
     const location = useLocation();
     const initSelectedStrategy = location.state.name + 'Strategy';
     const securityName = location.state.securityName;
- 
+
     return (
         <Grid container spacing={gridSpacing}>
             <Grid item xs={12}>

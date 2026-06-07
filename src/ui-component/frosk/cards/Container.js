@@ -397,7 +397,7 @@ export const Container = (props) => {
 									<Typography variant="h5" sx={{ whiteSpace: 'nowrap' }}>
 										{security.desc},Profit: {featuredStrategy.totalProfit}% , Beta: {security.beta}, Revenue growth: {security.yoyGrowth}%, PEG Ratio: {security.pegRatio}
     								</Typography>
-								) : null}  	               
+								) : null}
                                 </Grid>								
 								<Grid item>
 									<Box
@@ -587,7 +587,7 @@ export const Container = (props) => {
                             <ExpandMoreIcon />
                           </ExpandMore>
                             <Collapse in={expanded} timeout="auto" unmountOnExit>
-                              {featuredStrategy.trades ? <TradesTable trades={featuredStrategy.trades} />:null }
+                              {featuredStrategy.trades ? <TradesTable trades={featuredStrategy.trades} isIntraday={isIntraday} />:null }
                             </Collapse>   
                         </Grid>: null}
 

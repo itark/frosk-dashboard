@@ -1,8 +1,8 @@
 // assets
-import { IconBrandChrome, IconHelp, IconHandRock, IconRocket, IconTrendingUp, IconWallet } from '@tabler/icons';
+import { IconBrandChrome, IconHelp, IconHandRock, IconRocket, IconTrendingUp, IconWallet, IconClock } from '@tabler/icons';
 
 // constant
-const icons = { IconBrandChrome, IconHelp, IconHandRock, IconRocket, IconTrendingUp, IconWallet };
+const icons = { IconBrandChrome, IconHelp, IconHandRock, IconRocket, IconTrendingUp, IconWallet, IconClock };
 
 // ==============================|| SAMPLE PAGE & DOCUMENTATION MENU ITEMS ||============================== //
 
@@ -40,6 +40,14 @@ const other = {
             type: 'item',
             url: '/portfolio-page',
             icon: icons.IconWallet,
+            breadcrumbs: false
+        },
+        {
+            id: 'intraday-strategies-page',
+            title: 'Intraday',
+            type: 'item',
+            url: '/intraday-strategies-page',
+            icon: icons.IconClock,
             breadcrumbs: false
         },
         {

@@ -34,7 +34,7 @@ const CardWrapper = styled(MainCard)(({ theme }) => ({
 const PortfolioSummary = ({ history }) => {
     const theme = useTheme();
 
-    if (!history || history.length === 0) return null;
+    if (!Array.isArray(history) || history.length === 0) return null;
 
     const sorted = [...history].reverse();
     const first = sorted[0];

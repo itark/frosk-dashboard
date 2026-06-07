@@ -40,3 +40,22 @@ This is a React 18 SPA dashboard ("Frosk") deployed at `/frosk`. It connects to 
 ## Stack
 
 React 18, Material-UI v5, Redux, React Router v6, ApexCharts + lightweight-charts, Formik/Yup, create-react-app (react-scripts v5).
+
+## Implementation Order: Intraday Investor Dashboard
+
+### Step 1 — Backend endpoints (required first)
+
+Add these endpoints to the backend API (`localhost:8080`):
+
+1. **`GET /intradayOpenPositions`** — Returns securities where `OMX30IntradayMomentumStrategy` currently has an open position.
+   Response: `[{ securityName, entryPrice, entryTime, currentPrice, unrealizedPnl }]`
+
+2. **`GET /intradayTodaySignals`** — Returns all buy/sell signals fired today by `OMX30IntradayMomentumStrategy`.
+   Response: `[{ securityName, type (BUY/SELL), price, date (datetime in "YYYY-MM-DD HH:mm" format) }]`
+
+### Step 2 — Frontend: Intraday Signals page
+
+Build three-section page at `/intraday-strategies-page`:
+1. **Active Signals card** — fetches `/intradayOpenPositions`, shows what's live now
+2. **Today's Trades card** — fetches `/intradayTodaySignals`, actionable feed of today's signals
+3. **Strategy Scorecard** — existing Top Intraday Strategies widget (win ratio, SQN, expectancy)

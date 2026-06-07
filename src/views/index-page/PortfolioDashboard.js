@@ -33,7 +33,7 @@ const CardWrapper = styled(MainCard)(({ theme }) => ({
     }
 }));
 
-const PortfolioDashboard = ({ history }) => {
+const PortfolioDashboard = ({ history, basePath = '/portfolio', initialPortfolio }) => {
     const theme = useTheme();
     const [selectedId, setSelectedId] = useState(null);
     const [currentPortfolio, setCurrentPortfolio] = useState(null);
@@ -41,21 +41,29 @@ const PortfolioDashboard = ({ history }) => {
     const [positions, setPositions] = useState([]);
 
     useEffect(() => {
-        if (history.length > 0 && selectedId === null) {
+        if (initialPortfolio && !currentPortfolio) {
+            setCurrentPortfolio(initialPortfolio);
+            setPositions(initialPortfolio.positions.map((p) => ({ ...p, isNew: false, pnlDelta: null })));
+        }
+    }, [initialPortfolio]);
+
+    useEffect(() => {
+        if (Array.isArray(history) && history.length > 0 && selectedId === null) {
             setSelectedId(history[0].id);
         }
     }, [history, selectedId]);
 
     useEffect(() => {
-        if (selectedId === null || history.length === 0) return;
+        if (initialPortfolio) return;
+        if (selectedId === null || !Array.isArray(history) || history.length === 0) return;
 
         const idx = history.findIndex((h) => h.id === selectedId);
         const selected = history[idx];
         const previous = idx + 1 < history.length ? history[idx + 1] : null;
 
-        const fetches = [fetch(config.baseApi + '/portfolio/' + selected.id).then((r) => r.json())];
+        const fetches = [fetch(config.baseApi + basePath + '/' + selected.id).then((r) => r.json())];
         if (previous) {
-            fetches.push(fetch(config.baseApi + '/portfolio/' + previous.id).then((r) => r.json()));
+            fetches.push(fetch(config.baseApi + basePath + '/' + previous.id).then((r) => r.json()));
         }
 
         Promise.all(fetches).then(([curr, prev]) => {
@@ -116,7 +124,9 @@ const PortfolioDashboard = ({ history }) => {
                                     <Typography variant="subtitle2" sx={{ color: 'primary.light', mt: 0.25 }}>
                                         {currentPortfolio
                                             ? `${currentPortfolio.openPositionCount} positions`
-                                            : 'Loading...'}
+                                            : Array.isArray(history) && history.length === 0
+                                                ? 'No portfolio data'
+                                                : 'Loading...'}
                                     </Typography>
                                 }
                             />
