@@ -10,6 +10,7 @@ import SearchSection from './SearchSection';
 import ProfileSection from './ProfileSection';
 import NotificationSection from './NotificationSection';
 import InformationSection from './InformationSection';
+import DataSourceSwitch from './DataSourceSwitch';
 
 // assets
 import { IconMenu2 } from '@tabler/icons';
@@ -56,9 +57,8 @@ const Header = ({ handleLeftDrawerToggle }) => {
                 </ButtonBase>
             </Box>
 
-            {/* header search */}
-            {/* <SearchSection /> */}
-            <Box sx={{ flexGrow: 1 }} />
+            {/* data source switch */}
+            <DataSourceSwitch />
             <Box sx={{ flexGrow: 1 }} />
             <InformationSection />
             {/* notification & profile */}

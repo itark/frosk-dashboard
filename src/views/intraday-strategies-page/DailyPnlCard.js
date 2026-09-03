@@ -4,7 +4,8 @@ import { Avatar, Box, Grid, List, ListItem, ListItemAvatar, ListItemText, Typogr
 import { MaterialReactTable, useMaterialReactTable } from 'material-react-table';
 import Chart from 'react-apexcharts';
 import MainCard from 'ui-component/cards/MainCard';
-import config from 'config';
+import { useDataSource } from 'store/DataSourceContext';
+import PreRegistrationBadge from '../../ui-component/frosk/PreRegistrationBadge';
 import BarChartTwoToneIcon from '@mui/icons-material/BarChartTwoTone';
 
 const CardWrapper = styled(MainCard)(({ theme }) => ({
@@ -41,12 +42,13 @@ function aggregateByDay(tickers) {
             const date = (trade.sellTime || '').split(' ')[0];
             if (!date) continue;
             if (!dayMap[date]) {
-                dayMap[date] = { date, trades: 0, wins: 0, losses: 0, pnl: 0 };
+                dayMap[date] = { date, trades: 0, wins: 0, losses: 0, pnl: 0, hasPending: false };
             }
             dayMap[date].trades += 1;
             dayMap[date].pnl += trade.pnlPercent;
             if (trade.pnlPercent > 0) dayMap[date].wins += 1;
             else if (trade.pnlPercent < 0) dayMap[date].losses += 1;
+            if (ticker.preRegistrationPending) dayMap[date].hasPending = true;
         }
     }
     return Object.values(dayMap).sort((a, b) => a.date.localeCompare(b.date));
@@ -55,16 +57,17 @@ function aggregateByDay(tickers) {
 const DailyPnlCard = () => {
     const theme = useTheme();
     const [data, setData] = useState([]);
+    const { source, apiUrl } = useDataSource();
 
     useEffect(() => {
-        fetch(config.baseApi + '/intraday/pnl')
+        fetch(apiUrl('/intraday/pnl'))
             .then((res) => {
                 if (!res.ok) return [];
                 return res.json();
             })
             .then((items) => setData(Array.isArray(items) ? items : []))
             .catch(() => setData([]));
-    }, []);
+    }, [source, apiUrl]);
 
     const daily = useMemo(() => aggregateByDay(data), [data]);
 
@@ -79,6 +82,7 @@ const DailyPnlCard = () => {
     const totalPnl = cumulative.length > 0 ? cumulative[cumulative.length - 1].cumPnl : 0;
     const winDays = daily.filter((d) => d.pnl > 0).length;
     const lossDays = daily.filter((d) => d.pnl < 0).length;
+    const anyPending = daily.some((d) => d.hasPending);
 
     const series = [
         {
@@ -163,6 +167,12 @@ const DailyPnlCard = () => {
                 accessorKey: 'date',
                 header: 'Date',
                 size: 15,
+                Cell: ({ cell, row }) => (
+                    <>
+                        {cell.getValue()}
+                        {row.original.hasPending && <PreRegistrationBadge />}
+                    </>
+                ),
             },
             {
                 accessorKey: 'trades',
@@ -209,6 +219,89 @@ const DailyPnlCard = () => {
         },
     });
 
+    const todayRoundTrips = useMemo(() => {
+        const today = new Date().toLocaleDateString('sv-SE');
+        const rows = [];
+        for (const item of data) {
+            for (const trade of item.trades || []) {
+                if (trade.sellTime && trade.sellTime.startsWith(today)) {
+                    rows.push({
+                        ticker: item.ticker,
+                        strategy: (item.strategyName || '').replace('Strategy', ''),
+                        preRegistrationPending: item.preRegistrationPending,
+                        buyPrice: trade.buyPrice,
+                        sellPrice: trade.sellPrice,
+                        pnlPercent: trade.pnlPercent,
+                        entryTime: trade.buyTime ? trade.buyTime.slice(11, 16) : '-',
+                        exitTime: trade.sellTime ? trade.sellTime.slice(11, 16) : '-',
+                    });
+                }
+            }
+        }
+        return rows;
+    }, [data]);
+
+    const roundTripColumns = useMemo(
+        () => [
+            { accessorKey: 'ticker', header: 'Ticker', size: 80 },
+            {
+                accessorKey: 'strategy',
+                header: 'Strategi',
+                size: 120,
+                Cell: ({ cell, row }) => (
+                    <>
+                        {cell.getValue()}
+                        {row.original.preRegistrationPending && <PreRegistrationBadge />}
+                    </>
+                ),
+            },
+            {
+                accessorKey: 'buyPrice',
+                header: 'Entry-pris',
+                size: 90,
+                Cell: ({ cell }) => cell.getValue() != null ? Number(cell.getValue()).toFixed(2) : '-',
+            },
+            {
+                accessorKey: 'sellPrice',
+                header: 'Exit-pris',
+                size: 90,
+                Cell: ({ cell }) => cell.getValue() != null ? Number(cell.getValue()).toFixed(2) : '-',
+            },
+            {
+                accessorKey: 'pnlPercent',
+                header: 'PnL%',
+                size: 80,
+                Cell: ({ cell }) => {
+                    const val = cell.getValue();
+                    return (
+                        <Typography
+                            variant="body2"
+                            sx={{
+                                fontWeight: 'bold',
+                                color: val >= 0 ? theme.palette.success.main : theme.palette.error.main
+                            }}
+                        >
+                            {val >= 0 ? '+' : ''}{val != null ? Number(val).toFixed(2) : '0'}%
+                        </Typography>
+                    );
+                },
+            },
+            { accessorKey: 'entryTime', header: 'Entry-tid', size: 80 },
+            { accessorKey: 'exitTime', header: 'Exit-tid', size: 80 },
+        ],
+        [theme.palette.success.main, theme.palette.error.main],
+    );
+
+    const roundTripTable = useMaterialReactTable({
+        columns: roundTripColumns,
+        data: todayRoundTrips,
+        enableTopToolbar: false,
+        initialState: {
+            density: 'compact',
+            sorting: [{ id: 'exitTime', desc: true }],
+        },
+    });
+
     if (data.length === 0) return null;
 
     return (
@@ -245,7 +338,9 @@ const DailyPnlCard = () => {
                             />
                             <Box display="flex" gap={3} alignItems="center">
                                 <Box textAlign="center">
-                                    <Typography variant="caption" sx={{ color: 'primary.light' }}>Total P&L</Typography>
+                                    <Typography variant="caption" sx={{ color: 'primary.light' }}>
+                                        Total P&L{anyPending && <PreRegistrationBadge />}
+                                    </Typography>
                                     <Typography
                                         variant="h4"
                                         sx={{ color: totalPnl >= 0 ? theme.palette.success.light : theme.palette.error.light }}
@@ -271,7 +366,16 @@ const DailyPnlCard = () => {
                 </Box>
             </CardWrapper>
 
-            <Grid item>
+            {todayRoundTrips.length > 0 && (
+                <Grid item sx={{ mt: 2 }}>
+                    <Typography variant="h5" sx={{ mb: 1, px: 1, color: 'text.secondary' }}>
+                        Stängda round-trips idag ({todayRoundTrips.length})
+                    </Typography>
+                    <MaterialReactTable table={roundTripTable} />
+                </Grid>
+            )}
+
+            <Grid item sx={{ mt: 2 }}>
                 <MaterialReactTable table={table} />
             </Grid>
         </MainCard>

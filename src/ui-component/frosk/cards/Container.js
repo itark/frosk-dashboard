@@ -28,7 +28,7 @@ import MainCard from 'ui-component/cards/MainCard';
 import TradesTable from './TradesTable';
 import { gridSpacing } from 'store/constant';
 import '../../frosk/styles.css';
-import config from 'config';
+import { useDataSource } from 'store/DataSourceContext';
 
 const Context = createContext();
 
@@ -39,6 +39,7 @@ export const Container = (props) => {
 	const [featuredStrategy, setFeaturedStrategy] = useState();
 	const [strategies, setStrategies] = useState();
 	const [security, setSecurity] = useState();
+	const { apiUrl } = useDataSource();
 	const [expanded, setExpanded] = useState(false);
     const blue = '#2962FF';
 	const orange = '#e69138';
@@ -64,6 +65,8 @@ export const Container = (props) => {
 	const ema9Series = useRef(null);
 	const ema21Series = useRef(null);
 	const rsi7Series = useRef(null);
+	const shortSma10Series = useRef(null);
+	const gapPctSeries = useRef(null);
 
 
 	console.log('Container securityName',securityName);
@@ -104,7 +107,7 @@ export const Container = (props) => {
 
 	const getStrategies = () => {
 		const strats = [];
-		fetch(config.baseApi+"/strategies")
+		fetch(apiUrl("/strategies"))
 		  .then((response) => response.json())
 		  .then((response) => {
 			for (let i = 0; i < response.length; i++) {
@@ -118,7 +121,7 @@ export const Container = (props) => {
 	  }
 
 	const getSecurity =  () => {
-		fetch(`${config.baseApi}/security?name=${encodeURIComponent(securityName)}`)
+		fetch(apiUrl(`/security?name=${encodeURIComponent(securityName)}`))
 		.then((response) => response.json())
 		  .then((response) => {
 			setSecurity(response);
@@ -137,10 +140,11 @@ export const Container = (props) => {
 		const endpoint = isIntraday
 			? '/intradayPrices'
 			: '/prices';
-		fetch(`${config.baseApi}${endpoint}?security=${encodeURIComponent(securityName)}`)
+		fetch(apiUrl(`${endpoint}?security=${encodeURIComponent(securityName)}`))
 		.then((response) => response.json())
 		  .then((response) => {
-			const data = isIntraday ? response.map(toUnixTimestamp) : response;
+			const raw = isIntraday ? response.map(toUnixTimestamp) : response;
+			const data = raw.filter(d => d.open != null && d.high != null && d.low != null && d.close != null);
 			candleSeries.current.setData(data);
 			volumeSeries.current.setData(data);
 		  });
@@ -148,7 +152,7 @@ export const Container = (props) => {
 
 	const getFeaturedStrategy =  () => {
 		fetch(
-			`${config.baseApi}/featuredStrategy?security=${encodeURIComponent(securityName)}&strategy=${encodeURIComponent(selectedStrategy)}`
+			apiUrl(`/featuredStrategy?security=${encodeURIComponent(securityName)}&strategy=${encodeURIComponent(selectedStrategy)}`)
 		  )
 		.then((response) => response.json())
 		  .then((response) => {
@@ -168,6 +172,8 @@ export const Container = (props) => {
 			setEma9(response);
 			setEma21(response);
 			setRsi7(response);
+			setShortSma10(response);
+			setGapPct(response);
 
 			setMarkers(response);
 			setFeaturedStrategy(response);
@@ -177,6 +183,7 @@ export const Container = (props) => {
 	const setShortEma =  (response) => {
 		const shortEma = response.indicatorValues
 			.filter(o => o.name === 'shortEma' || o.name === 'sma10')
+			.filter(dp => dp.value != null)
 			.map(datapoint => ({
 				time: mapTime(datapoint.time),
 				value: datapoint.value,
@@ -189,6 +196,7 @@ export const Container = (props) => {
 	const setLongEma =  (response) => {
 		const longEma = response.indicatorValues
 			.filter(o => o.name === 'longEma' || o.name === 'sma20')
+			.filter(dp => dp.value != null)
 			.map(datapoint => ({
 				time: mapTime(datapoint.time),
 				value: datapoint.value,
@@ -201,6 +209,7 @@ export const Container = (props) => {
 	const setParabolicSar =  (response) => {
 		const pSar = response.indicatorValues
 			.filter(o => o.name === 'pSar' || o.name === 'sma50')
+			.filter(dp => dp.value != null)
 			.map(datapoint => ({
 				time: mapTime(datapoint.time),
 				value: datapoint.value,
@@ -213,6 +222,7 @@ export const Container = (props) => {
 	const setCel =  (response) => {
 		const cel = response.indicatorValues
 			.filter(o => o.name === 'cel' || o.name === 'sma100')
+			.filter(dp => dp.value != null)
 			.map(datapoint => ({
 				time: mapTime(datapoint.time),
 				value: datapoint.value,
@@ -225,6 +235,7 @@ export const Container = (props) => {
 	const setMacd =  (response) => {
 		const macd = response.indicatorValues
 			.filter(o => o.name === 'macd')
+			.filter(dp => dp.value != null)
 			.map(datapoint => ({
 				time: mapTime(datapoint.time),
 				value: datapoint.value,
@@ -237,6 +248,7 @@ export const Container = (props) => {
 	const setEmaMacd =  (response) => {
 		const emaMacd = response.indicatorValues
 			.filter(o => o.name === 'emaMacd')
+			.filter(dp => dp.value != null)
 			.map(datapoint => ({
 				time: mapTime(datapoint.time),
 				value: datapoint.value,
@@ -249,6 +261,7 @@ export const Container = (props) => {
 	const setAdx =  (response) => {
 		const adx = response.indicatorValues
 			.filter(o => o.name === 'adx')
+			.filter(dp => dp.value != null)
 			.map(datapoint => ({
 				time: mapTime(datapoint.time),
 				value: datapoint.value,
@@ -261,6 +274,7 @@ export const Container = (props) => {
 	const setPlusDI =  (response) => {
 		const plusDI = response.indicatorValues
 			.filter(o => o.name === 'plusDI')
+			.filter(dp => dp.value != null)
 			.map(datapoint => ({
 				time: mapTime(datapoint.time),
 				value: datapoint.value,
@@ -273,6 +287,7 @@ export const Container = (props) => {
 	const setMinusDI =  (response) => {
 		const minusDI = response.indicatorValues
 			.filter(o => o.name === 'minusDI')
+			.filter(dp => dp.value != null)
 			.map(datapoint => ({
 				time: mapTime(datapoint.time),
 				value: datapoint.value,
@@ -285,6 +300,7 @@ export const Container = (props) => {
 	const setLongCci =  (response) => {
 		const longCci = response.indicatorValues
 			.filter(o => o.name === 'longCci')
+			.filter(dp => dp.value != null)
 			.map(datapoint => ({
 				time: mapTime(datapoint.time),
 				value: datapoint.value,
@@ -297,6 +313,7 @@ export const Container = (props) => {
 	const setShortCci =  (response) => {
 		const shortCci = response.indicatorValues
 			.filter(o => o.name === 'shortCci')
+			.filter(dp => dp.value != null)
 			.map(datapoint => ({
 				time: mapTime(datapoint.time),
 				value: datapoint.value,
@@ -309,6 +326,7 @@ export const Container = (props) => {
 	const setClose =  (response) => {
 		const close = response.indicatorValues
 			.filter(o => o.name === 'close')
+			.filter(dp => dp.value != null)
 			.map(datapoint => ({
 				time: mapTime(datapoint.time),
 				value: datapoint.value,
@@ -320,6 +338,7 @@ export const Container = (props) => {
 	const setEma9 =  (response) => {
 		const ema9 = response.indicatorValues
 			.filter(o => o.name === 'ema9')
+			.filter(dp => dp.value != null)
 			.map(datapoint => ({
 				time: mapTime(datapoint.time),
 				value: datapoint.value,
@@ -331,6 +350,7 @@ export const Container = (props) => {
 	const setEma21 =  (response) => {
 		const ema21 = response.indicatorValues
 			.filter(o => o.name === 'ema21')
+			.filter(dp => dp.value != null)
 			.map(datapoint => ({
 				time: mapTime(datapoint.time),
 				value: datapoint.value,
@@ -342,12 +362,42 @@ export const Container = (props) => {
 	const setRsi7 =  (response) => {
 		const rsi7 = response.indicatorValues
 			.filter(o => o.name === 'rsi7')
+			.filter(dp => dp.value != null)
 			.map(datapoint => ({
 				time: mapTime(datapoint.time),
 				value: datapoint.value,
 				name: datapoint.name
 		}));
 		rsi7Series.current.setData(rsi7);
+	}
+
+	// NewsBreakoutStrategy — SMA(10), the daily version's stand-in for session
+	// VWAP. Same price scale as close/ema9/ema21, so it overlays the main pane.
+	const setShortSma10 =  (response) => {
+		const shortSma10 = response.indicatorValues
+			.filter(o => o.name === 'shortSma10')
+			.filter(dp => dp.value != null)
+			.map(datapoint => ({
+				time: mapTime(datapoint.time),
+				value: datapoint.value,
+				name: datapoint.name
+		}));
+		shortSma10Series.current.setData(shortSma10);
+	}
+
+	// NewsBreakoutStrategy — overnight gap %. A few points wide, so on the
+	// price pane it would be an invisible flat line next to 100+ SEK prices;
+	// own pane instead.
+	const setGapPct =  (response) => {
+		const gapPct = response.indicatorValues
+			.filter(o => o.name === 'gapPct')
+			.filter(dp => dp.value != null)
+			.map(datapoint => ({
+				time: mapTime(datapoint.time),
+				value: datapoint.value,
+				name: datapoint.name
+		}));
+		gapPctSeries.current.setData(gapPct);
 	}
 
 	const setMarkers =  (response) => {
@@ -414,7 +464,7 @@ export const Container = (props) => {
 										}}
 										onClick={async () => {
 											try {
- 												await fetch(`${config.baseApi}/runAction?action=LOAD_DATA&security=${encodeURIComponent(security.id)}&strategy=${encodeURIComponent(selectedStrategy)}`)
+ 												await fetch(apiUrl(`/runAction?action=LOAD_DATA&security=${encodeURIComponent(security.id)}&strategy=${encodeURIComponent(selectedStrategy)}`))
 												// refresh displayed data after backend update
 												getSecurityData();
 												getFeaturedStrategy();
@@ -441,7 +491,7 @@ export const Container = (props) => {
 										}}
 										onClick={async () => {
 											try {
- 												await fetch(`${config.baseApi}/runAction?action=RUN_STRATEGY&security=${encodeURIComponent(security.id)}&strategy=${encodeURIComponent(selectedStrategy)}`)
+ 												await fetch(apiUrl(`/runAction?action=RUN_STRATEGY&security=${encodeURIComponent(security.id)}&strategy=${encodeURIComponent(selectedStrategy)}`))
 												// refresh displayed data after backend update
 												getSecurityData();
 												getFeaturedStrategy();
@@ -565,6 +615,11 @@ export const Container = (props) => {
 									ref={ema21Series}
 									color={blue}
 								/>
+								<Line
+									type={'shortSma10'}
+									ref={shortSma10Series}
+									color={'#8e44ad'}
+								/>
 							</Chart>
                         </Grid>
 						<Grid item xs={12}>
@@ -573,6 +628,15 @@ export const Container = (props) => {
 									type={'rsi7'}
 									ref={rsi7Series}
 									color={theme.palette.success.dark}
+								/>
+							</Chart>
+						</Grid>
+						<Grid item xs={12}>
+							<Chart layout={chartLayoutOptions} securityName={securityName} isIntraday={isIntraday} height={150}>
+								<Line
+									type={'gapPct'}
+									ref={gapPctSeries}
+									color={'#c0392b'}
 								/>
 							</Chart>
 						</Grid>

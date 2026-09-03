@@ -18,7 +18,8 @@ import { drawerWidth } from 'store/constant';
 
 const Sidebar = ({ drawerOpen, drawerToggle, window }) => {
     const theme = useTheme();
-    const matchUpMd = useMediaQuery(theme.breakpoints.up('md'));
+    // noSsr: see MainLayout/index.js — same double-resolution issue applies here.
+    const matchUpMd = useMediaQuery(theme.breakpoints.up('md'), { noSsr: true });
 
     const drawer = (
         <>
@@ -70,7 +71,10 @@ const Sidebar = ({ drawerOpen, drawerToggle, window }) => {
                         }
                     }
                 }}
-                ModalProps={{ keepMounted: true }}
+                // No keepMounted: on mobile (variant="temporary") the modal wrapper
+                // stays full-screen and pointer-events:auto even while closed unless
+                // it's allowed to actually unmount — with keepMounted it never reaches
+                // that state and silently swallows every tap on the page underneath it.
                 color="inherit"
             >
                 {drawer}

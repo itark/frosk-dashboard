@@ -4,7 +4,7 @@ import { Grid, Avatar, Box, List, ListItem, ListItemAvatar, ListItemText, Typogr
 
 import MainCard from 'ui-component/cards/MainCard';
 import { gridSpacing } from 'store/constant';
-import config from 'config';
+import { useDataSource } from 'store/DataSourceContext';
 import OpenSmartSignalsTable from 'ui-component/frosk/cards/OpenSmartSignalsTable';
 
 // assets
@@ -41,15 +41,16 @@ const CardWrapper = styled(MainCard)(({ theme }) => ({
 const OpenSmartSignalsCard = ({ isLoading }) => {
     const theme = useTheme();
     const [smartSignals, setSmartSignals] = useState([]);
+    const { source, apiUrl } = useDataSource();
 
     useEffect(() => {
-        fetch(config.baseApi+"/smartSignals?open=true")
+        fetch(apiUrl("/smartSignals?open=true"))
         .then(response => response.json())
         .then((result) => {
             //console.log('smartSignals?open=true',result);
             setSmartSignals(result);
         })
-    }, []);
+    }, [source, apiUrl]);
 
     return (
         <>

@@ -4,7 +4,7 @@ import { Grid, Avatar, Box, List, ListItem, ListItemAvatar, ListItemText, Typogr
 
 import MainCard from 'ui-component/cards/MainCard';
 import { gridSpacing } from 'store/constant';
-import config from 'config';
+import { useDataSource } from 'store/DataSourceContext';
 import TopFeaturedStrategiesTable from 'ui-component/frosk/cards/TopFeaturedStrategiesTable';
 
 // assets
@@ -39,15 +39,16 @@ const CardWrapper = styled(MainCard)(({ theme }) => ({
 const TopFeaturedStrategyCard = ({ isLoading }) => {
     const theme = useTheme();
     const [topFeaturedStrategies, setTopFeaturedStrategies] = useState([]);
+    const { source, apiUrl } = useDataSource();
 
     useEffect(() => {
-        fetch(config.baseApi+"/topFeaturedStrategies")
+        fetch(apiUrl("/topFeaturedStrategies"))
         .then(response => response.json())
         .then((response) => {
                 console.log('topFeaturedStrategies',response);
                 setTopFeaturedStrategies(response);
         })
-    }, []);
+    }, [source, apiUrl]);
 
     return (
         <>

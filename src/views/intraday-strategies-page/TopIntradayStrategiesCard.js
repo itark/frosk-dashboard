@@ -3,7 +3,7 @@ import { styled, useTheme } from '@mui/material/styles';
 import { Grid, Avatar, Box, List, ListItem, ListItemAvatar, ListItemText, Typography } from '@mui/material';
 
 import MainCard from 'ui-component/cards/MainCard';
-import config from 'config';
+import { useDataSource } from 'store/DataSourceContext';
 import TopIntradayStrategiesTable from './TopIntradayStrategiesTable';
 
 import AccessTimeTwoToneIcon from '@mui/icons-material/AccessTimeTwoTone';
@@ -22,15 +22,15 @@ const CardWrapper = styled(MainCard)(({ theme }) => ({
 const TopIntradayStrategiesCard = ({ isLoading }) => {
     const theme = useTheme();
     const [topFeaturedStrategies, setTopFeaturedStrategies] = useState([]);
+    const { source, apiUrl } = useDataSource();
 
     useEffect(() => {
-        fetch(config.baseApi + "/topFeaturedStrategies")
+        fetch(apiUrl("/topFeaturedStrategies"))
             .then(response => response.json())
             .then((response) => {
-                const filtered = response.filter(s => s.name === 'OMX30IntradayMomentum');
-                setTopFeaturedStrategies(filtered);
+                setTopFeaturedStrategies(response);
             })
-    }, []);
+    }, [source, apiUrl]);
 
     return (
         <>

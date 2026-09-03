@@ -7,7 +7,7 @@ import { Typography, Grid, Tooltip } from '@mui/material';
 // project imports
 import { gridSpacing } from 'store/constant';
 import StrategiesCard from './StrategiesCard';
-import config from 'config';
+import { useDataSource } from 'store/DataSourceContext';
 import MainCard from 'ui-component/cards/MainCard';
 
 const StrategiesPage = () => {
@@ -16,9 +16,10 @@ const StrategiesPage = () => {
     const [featuredStrategies, setFeaturedStrategies] = useState([]);
     const [error, setError] = useState(null);
     const [isLoaded, setIsLoaded] = useState(false);
+    const { source, apiUrl } = useDataSource();
 
     useEffect(() => {
-        fetch(config.baseApi+"/featuredStrategies")
+        fetch(apiUrl("/featuredStrategies"))
             .then(response => response.json())
             .then(
             (response) => {
@@ -33,7 +34,7 @@ const StrategiesPage = () => {
                 setError(error);
             }
             )
-    }, [])
+    }, [source, apiUrl])
 
 
     return (

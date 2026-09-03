@@ -5,10 +5,19 @@ import TodaySignalsCard from './TodaySignalsCard';
 import TopIntradayStrategiesCard from './TopIntradayStrategiesCard';
 import IntradayPortfolioCard from './IntradayPortfolioCard';
 import DailyPnlCard from './DailyPnlCard';
+import CryptoPaperAccountCard from 'views/index-page/CryptoPaperAccountCard';
+import { useDataSource } from 'store/DataSourceContext';
 
 const IntradayStrategiesPage = () => {
+    const { isCrypto } = useDataSource();
+
     return (
         <Grid container spacing={gridSpacing}>
+            {isCrypto && (
+                <Grid item xs={12}>
+                    <CryptoPaperAccountCard />
+                </Grid>
+            )}
             <Grid item xs={12}>
                 <ActiveSignalsCard />
             </Grid>

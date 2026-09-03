@@ -5,8 +5,11 @@ import { Grid, Avatar, Box, List, ListItem, ListItemAvatar, ListItemText, Typogr
 import { MaterialReactTable, useMaterialReactTable } from 'material-react-table';
 
 import MainCard from 'ui-component/cards/MainCard';
-import config from 'config';
+import { useDataSource } from 'store/DataSourceContext';
 import ColumnBox from '../../ui-component/frosk/ColumnBox';
+import PreRegistrationBadge from '../../ui-component/frosk/PreRegistrationBadge';
+import SignalStrengthBadge from '../../ui-component/frosk/SignalStrengthBadge';
+import StrategyQualityBadge from '../../ui-component/frosk/StrategyQualityBadge';
 
 import TrendingUpTwoToneIcon from '@mui/icons-material/TrendingUpTwoTone';
 
@@ -25,17 +28,18 @@ const ActiveSignalsCard = () => {
     const theme = useTheme();
     const navigate = useNavigate();
     const [positions, setPositions] = useState([]);
+    const { source, apiUrl } = useDataSource();
 
     useEffect(() => {
         let cancelled = false;
-        fetch(config.baseApi + "/intradayOpenPositions")
+        fetch(apiUrl("/intradayOpenPositions"))
             .then(response => response.json())
             .then((response) => {
                 if (!cancelled) setPositions(response);
             })
             .catch(err => console.error('intradayOpenPositions fetch failed', err));
         return () => { cancelled = true; };
-    }, []);
+    }, [source, apiUrl]);
 
     const columns = useMemo(
         () => [
@@ -48,6 +52,18 @@ const ActiveSignalsCard = () => {
                 accessorKey: 'strategyName',
                 header: 'Strategy',
                 size: 10,
+                Cell: ({ cell, row }) => (
+                    <>
+                        {cell.getValue()}
+                        {row.original.preRegistrationPending && <PreRegistrationBadge />}
+                        <SignalStrengthBadge strength={row.original.signalStrength} />
+                        <StrategyQualityBadge
+                            winRate={row.original.historicalWinRate}
+                            sqn={row.original.historicalSqn}
+                            trades={row.original.historicalTrades}
+                        />
+                    </>
+                ),
             },
             {
                 accessorKey: 'entryPrice',

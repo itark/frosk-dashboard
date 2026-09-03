@@ -11,6 +11,7 @@ import themes from 'themes';
 
 // project imports
 import NavigationScroll from 'layout/NavigationScroll';
+import { DataSourceProvider } from 'store/DataSourceContext';
 
 // ==============================|| APP ||============================== //
 
@@ -21,9 +22,11 @@ const App = () => {
         <StyledEngineProvider injectFirst>
             <ThemeProvider theme={themes(customization)}>
                 <CssBaseline />
-                <NavigationScroll>
-                    <Routes />
-                </NavigationScroll>
+                <DataSourceProvider>
+                    <NavigationScroll>
+                        <Routes />
+                    </NavigationScroll>
+                </DataSourceProvider>
             </ThemeProvider>
         </StyledEngineProvider>
     );

@@ -66,7 +66,13 @@ const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(({
 
 const MainLayout = () => {
     const theme = useTheme();
-    const matchDownMd = useMediaQuery(theme.breakpoints.down('lg'));
+    // noSsr: this is CRA (client-only, no SSR), so skip useMediaQuery's default
+    // "assume false, correct after mount" pass — without it, mobile briefly sees
+    // matchDownMd=false then true, firing the effect below twice in a row
+    // (open, then immediately close), which left the drawer's exit transition
+    // stuck mid-flight and its now-invisible modal backdrop still capturing
+    // every tap on the page underneath it.
+    const matchDownMd = useMediaQuery(theme.breakpoints.down('lg'), { noSsr: true });
 
     // Handle left drawer
     const leftDrawerOpened = useSelector((state) => state.customization.opened);

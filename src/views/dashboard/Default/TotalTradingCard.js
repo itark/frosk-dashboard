@@ -8,7 +8,7 @@ import { Avatar, Box, List, ListItem, ListItemAvatar, ListItemText, Typography }
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
 import TotalIncomeCard from 'ui-component/cards/Skeleton/TotalIncomeCard';
-import config from 'config';
+import { useDataSource } from 'store/DataSourceContext';
 
 // assets
 import StorefrontTwoToneIcon from '@mui/icons-material/StorefrontTwoTone';
@@ -45,16 +45,17 @@ const CardWrapper = styled(MainCard)(({ theme }) => ({
 const TotalTradingCard = ({ isLoading }) => {
     const theme = useTheme();
     const [totalTrading, setTotalTrading] = useState();
+    const { source, apiUrl } = useDataSource();
 
     useEffect(() => {
-        fetch(config.baseApi+"/totalTrading")
+        fetch(apiUrl("/totalTrading"))
         .then(response => response.json())
         .then((result) => {
             console.log('isLoading',isLoading);
             console.log('totalTrading',result);
             setTotalTrading(result);
          })
-    }, []);
+    }, [source, apiUrl]);
 
 
     return (

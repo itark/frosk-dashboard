@@ -12,7 +12,7 @@ import Chart from 'react-apexcharts';
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
 import { gridSpacing } from 'store/constant';
-import config from 'config';
+import { useDataSource } from 'store/DataSourceContext';
 import topDataQ from './chart-data/top-chart-q';
 import StorefrontTwoToneIcon from '@mui/icons-material/StorefrontTwoTone';
 
@@ -47,10 +47,11 @@ const CardWrapper = styled(MainCard)(({ theme }) => ({
 
 const TopStrategyPerformanceQualityBarChart = ({ isLoading }) => {
     const theme = useTheme();
+    const { source, apiUrl } = useDataSource();
 
     useEffect(() => {
         const data = [];
-        fetch(config.baseApi+"/topStrategies")
+        fetch(apiUrl("/topStrategies"))
         .then(response => response.json())
         .then((response) => {
                 console.log('topStrategies',response)
@@ -66,7 +67,7 @@ const TopStrategyPerformanceQualityBarChart = ({ isLoading }) => {
                 }   
                 ApexCharts.exec(`top-chart-q`, 'updateOptions', newChartData);
         })
-    }, []);
+    }, [source, apiUrl]);
 
     return (
         <>

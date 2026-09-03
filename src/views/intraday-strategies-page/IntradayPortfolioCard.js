@@ -1,16 +1,17 @@
 import { useState, useEffect } from 'react';
 import { Grid } from '@mui/material';
 import { gridSpacing } from 'store/constant';
-import config from 'config';
+import { useDataSource } from 'store/DataSourceContext';
 import PortfolioDashboard from 'views/index-page/PortfolioDashboard';
 import PortfolioSummary from 'views/index-page/PortfolioSummary';
 
 const IntradayPortfolioCard = () => {
     const [history, setHistory] = useState([]);
     const [portfolio, setPortfolio] = useState(null);
+    const { source, apiUrl } = useDataSource();
 
     useEffect(() => {
-        fetch(config.baseApi + '/portfolio/intraday/history')
+        fetch(apiUrl('/portfolio/intraday/history'))
             .then((res) => {
                 if (!res.ok) return [];
                 return res.json();
@@ -20,7 +21,7 @@ const IntradayPortfolioCard = () => {
             })
             .catch(() => setHistory([]));
 
-        fetch(config.baseApi + '/portfolio/intraday')
+        fetch(apiUrl('/portfolio/intraday'))
             .then((res) => {
                 if (!res.ok) return null;
                 return res.json();
@@ -29,7 +30,7 @@ const IntradayPortfolioCard = () => {
                 if (data && data.positions) setPortfolio(data);
             })
             .catch(() => {});
-    }, []);
+    }, [source, apiUrl]);
 
     return (
         <Grid container spacing={gridSpacing}>

@@ -6,13 +6,14 @@ import { Typography, Grid } from '@mui/material';
 //table
 import { gridSpacing } from 'store/constant';
 import SecuritiesCard from './SecuritiesCard';
-import config from 'config';
+import { useDataSource } from 'store/DataSourceContext';
 
 const FroskPage = () => {
     const [securities, setSecurities] = useState([]);
-    
+    const { source, apiUrl } = useDataSource();
+
     useEffect(() => {
-        fetch(config.baseApi+"/metadata")
+        fetch(apiUrl("/metadata"))
             .then(res => res.json())
             .then(
             (result) => {
@@ -22,7 +23,7 @@ const FroskPage = () => {
                 console.error(error);
             }
             )
-    }, [])
+    }, [source, apiUrl])
 
     return (
         <Grid item xs={12}>

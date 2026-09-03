@@ -7,6 +7,7 @@ import StrategyPerformanceChartCard from './StrategyPerformanceChartCard';
 import TopStrategyPerformanceBarChart from './TopStrategyPerformanceBarChart';
 import TopStrategyPerformanceQualityBarChart from './TopStrategyPerformanceQualityBarChart';
 import TopFeaturedStrategyCard from './TopFeaturedStrategyCard';
+import TopWinnersTodayCard from './TopWinnersTodayCard';
 import OpenSmartSignalsCard from './OpenSmartSignalsCard';
 import OpenSignalsCard from './OpenSignalsCard';
 import { gridSpacing } from 'store/constant';
@@ -52,7 +53,15 @@ const Dashboard = () => {
             <Grid item xs={12}>
             <Grid container spacing={gridSpacing}>
                     <Grid item sm={12} xs={12} md={12} lg={12}>
-                       <TopFeaturedStrategyCard isLoading={isLoading} />   
+                       <TopWinnersTodayCard isLoading={isLoading} />
+                    </Grid>
+                </Grid>
+            </Grid>
+
+            <Grid item xs={12}>
+            <Grid container spacing={gridSpacing}>
+                    <Grid item sm={12} xs={12} md={12} lg={12}>
+                       <TopFeaturedStrategyCard isLoading={isLoading} />
                     </Grid>
                 </Grid>
             </Grid>

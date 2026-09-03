@@ -3,7 +3,7 @@ import { styled, useTheme } from '@mui/material/styles';
 import { Grid, Avatar, Box, List, ListItem, ListItemAvatar, ListItemText, Typography } from '@mui/material';
 
 import MainCard from 'ui-component/cards/MainCard';
-import config from 'config';
+import { useDataSource } from 'store/DataSourceContext';
 import OpenSignalsTable from 'ui-component/frosk/cards/OpenSignalsTable';
 
 // assets
@@ -40,15 +40,16 @@ const CardWrapper = styled(MainCard)(({ theme }) => ({
 const OpenSignalsCard = ({ isLoading }) => {
     const theme = useTheme();
     const [openSignals, setOpenSignals] = useState([]);
+    const { source, apiUrl } = useDataSource();
 
     useEffect(() => {
-        fetch(config.baseApi+"/openSignals")
+        fetch(apiUrl("/openSignals"))
         .then(response => response.json())
         .then((result) => {
             console.log('openSignals',result);
             setOpenSignals(result);
         })
-    }, []);
+    }, [source, apiUrl]);
 
     return (
         <>
