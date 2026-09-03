@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { styled, useTheme } from '@mui/material/styles';
 import { Grid, Avatar, Box, Chip, List, ListItem, ListItemAvatar, ListItemText, Typography, Select, MenuItem } from '@mui/material';
 import MainCard from 'ui-component/cards/MainCard';
-import config from 'config';
+import { useDataSource } from 'store/DataSourceContext';
 import PortfolioTable from './PortfolioTable';
 import AccountBalanceWalletOutlinedIcon from '@mui/icons-material/AccountBalanceWalletOutlined';
 
@@ -33,8 +33,19 @@ const CardWrapper = styled(MainCard)(({ theme }) => ({
     }
 }));
 
+// HedgeIndexService.regimeLabel() buckets, mapped to a buy/wait read for the
+// dashboard. Deliberately reuses the existing, already-validated HedgeIndex
+// regime rather than a new composite signal.
+const TIMING_BY_REGIME = {
+    'Strong Risk-On': { color: 'success', guidance: 'Market favors buying new positions.' },
+    'Cautious / Transition': { color: 'warning', guidance: 'Mixed signals — consider waiting on new buys.' },
+    'Neutral / Defensive': { color: 'warning', guidance: 'Defensive tilt — consider waiting on new buys.' },
+    'Strong Risk-Off': { color: 'error', guidance: 'Risk-off — consider holding off on new buys.' }
+};
+
 const PortfolioDashboard = ({ history, basePath = '/portfolio', initialPortfolio }) => {
     const theme = useTheme();
+    const { apiUrl } = useDataSource();
     const [selectedId, setSelectedId] = useState(null);
     const [currentPortfolio, setCurrentPortfolio] = useState(null);
     const [previousPortfolio, setPreviousPortfolio] = useState(null);
@@ -43,12 +54,13 @@ const PortfolioDashboard = ({ history, basePath = '/portfolio', initialPortfolio
     useEffect(() => {
         if (initialPortfolio && !currentPortfolio) {
             setCurrentPortfolio(initialPortfolio);
-            setPositions(initialPortfolio.positions.map((p) => ({ ...p, isNew: false, pnlDelta: null })));
+            setPositions((initialPortfolio.positions || []).map((p) => ({ ...p, isNew: !!p.newPosition, pnlDelta: null })));
         }
     }, [initialPortfolio]);
 
     useEffect(() => {
-        if (Array.isArray(history) && history.length > 0 && selectedId === null) {
+        if (!Array.isArray(history) || history.length === 0) return;
+        if (selectedId === null || !history.some((h) => h.id === selectedId)) {
             setSelectedId(history[0].id);
         }
     }, [history, selectedId]);
@@ -58,27 +70,32 @@ const PortfolioDashboard = ({ history, basePath = '/portfolio', initialPortfolio
         if (selectedId === null || !Array.isArray(history) || history.length === 0) return;
 
         const idx = history.findIndex((h) => h.id === selectedId);
+        if (idx === -1) return;
         const selected = history[idx];
         const previous = idx + 1 < history.length ? history[idx + 1] : null;
 
-        const fetches = [fetch(config.baseApi + basePath + '/' + selected.id).then((r) => r.json())];
+        const fetches = [fetch(apiUrl(basePath + '/' + selected.id)).then((r) => (r.ok ? r.json() : null))];
         if (previous) {
-            fetches.push(fetch(config.baseApi + basePath + '/' + previous.id).then((r) => r.json()));
+            fetches.push(fetch(apiUrl(basePath + '/' + previous.id)).then((r) => (r.ok ? r.json() : null)));
         }
 
         Promise.all(fetches).then(([curr, prev]) => {
+            if (!curr) return;
             setCurrentPortfolio(curr);
             setPreviousPortfolio(prev || null);
 
             const previousPositionMap = prev
-                ? new Map(prev.positions.map((p) => [p.securityName, p]))
+                ? new Map((prev.positions || []).map((p) => [p.securityName, p]))
                 : new Map();
 
-            const enriched = curr.positions.map((p) => {
+            const enriched = (curr.positions || []).map((p) => {
                 const prevPos = previousPositionMap.get(p.securityName);
                 return {
                     ...p,
-                    isNew: !prevPos,
+                    // Backend flag: entryDate falls on this snapshot's build date, i.e.
+                    // actually opened this run — more reliable than "absent from the
+                    // previous snapshot", which a re-scan gap could also produce.
+                    isNew: !!p.newPosition,
                     pnlDelta: prevPos ? p.unrealizedPnlPercent - prevPos.unrealizedPnlPercent : null
                 };
             });
@@ -86,9 +103,14 @@ const PortfolioDashboard = ({ history, basePath = '/portfolio', initialPortfolio
         });
     }, [selectedId, history]);
 
+    // totalPnlPercent can be null from the backend (e.g. no snapshot yet for a
+    // freshly-started crypto process, or historical rows predating the field).
+    const hasPnl = (p) => p != null && typeof p.totalPnlPercent === 'number';
+    const pnlOf = (p) => (hasPnl(p) ? p.totalPnlPercent : 0);
+
     const removedPositions = currentPortfolio && previousPortfolio
-        ? previousPortfolio.positions.filter(
-              (p) => !currentPortfolio.positions.some((c) => c.securityName === p.securityName)
+        ? (previousPortfolio.positions || []).filter(
+              (p) => !(currentPortfolio.positions || []).some((c) => c.securityName === p.securityName)
           )
         : [];
 
@@ -150,7 +172,9 @@ const PortfolioDashboard = ({ history, basePath = '/portfolio', initialPortfolio
                                         }
                                     }}
                                 >
-                                    {history.map((h) => (
+                                    {/* Intraday history is a snapshot every 15 min — cap the
+                                        picker to the most recent ones so the menu stays usable. */}
+                                    {history.slice(0, 300).map((h) => (
                                         <MenuItem key={h.id} value={h.id}>
                                             {h.snapshotDate} ({h.openPositionCount} pos)
                                         </MenuItem>
@@ -160,13 +184,27 @@ const PortfolioDashboard = ({ history, basePath = '/portfolio', initialPortfolio
                             {currentPortfolio && (
                                 <Box display="flex" gap={1} alignItems="center">
                                     <Typography variant="h3" sx={{ color: '#fff' }}>
-                                        {currentPortfolio.totalPnlPercent.toFixed(2)}%
+                                        {hasPnl(currentPortfolio) ? `${currentPortfolio.totalPnlPercent.toFixed(2)}%` : '—'}
                                     </Typography>
                                 </Box>
                             )}
                         </ListItem>
                     </List>
                 </Box>
+
+                {currentPortfolio && currentPortfolio.hedgeIndexRegime && (
+                    <Box sx={{ px: 2, pb: 1 }}>
+                        <Chip
+                            label={`${currentPortfolio.hedgeIndexRegime} (score ${currentPortfolio.hedgeIndexScore})`}
+                            size="small"
+                            color={TIMING_BY_REGIME[currentPortfolio.hedgeIndexRegime]?.color || 'default'}
+                            sx={{ fontWeight: 600, mr: 1 }}
+                        />
+                        <Typography variant="caption" sx={{ color: 'primary.light' }}>
+                            {TIMING_BY_REGIME[currentPortfolio.hedgeIndexRegime]?.guidance}
+                        </Typography>
+                    </Box>
+                )}
 
                 {(newCount > 0 || removedPositions.length > 0) && (
                     <Box sx={{ px: 2, pb: 1 }}>
@@ -184,13 +222,13 @@ const PortfolioDashboard = ({ history, basePath = '/portfolio', initialPortfolio
                                 sx={{ backgroundColor: theme.palette.error.dark, color: '#fff', mr: 1 }}
                             />
                         )}
-                        {previousPortfolio && (
+                        {previousPortfolio && hasPnl(currentPortfolio) && hasPnl(previousPortfolio) && (
                             <Chip
-                                label={`PnL Δ ${(currentPortfolio.totalPnlPercent - previousPortfolio.totalPnlPercent).toFixed(2)}%`}
+                                label={`PnL Δ ${(pnlOf(currentPortfolio) - pnlOf(previousPortfolio)).toFixed(2)}%`}
                                 size="small"
                                 sx={{
                                     backgroundColor:
-                                        currentPortfolio.totalPnlPercent - previousPortfolio.totalPnlPercent >= 0
+                                        pnlOf(currentPortfolio) - pnlOf(previousPortfolio) >= 0
                                             ? theme.palette.success.dark
                                             : theme.palette.error.dark,
                                     color: '#fff'

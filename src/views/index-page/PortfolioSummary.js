@@ -31,6 +31,20 @@ const CardWrapper = styled(MainCard)(({ theme }) => ({
     }
 }));
 
+// The intraday portfolio writes a snapshot every 15 minutes, so `history` can be
+// thousands of rows. A category-axis chart with that many points renders blank
+// (and freezes the tab). Thin the series to a fixed budget, always keeping the
+// first and last points so the endpoints stay exact.
+const MAX_CHART_POINTS = 220;
+
+const downsample = (arr, max) => {
+    if (arr.length <= max) return arr;
+    const step = (arr.length - 1) / (max - 1);
+    const out = [];
+    for (let i = 0; i < max; i += 1) out.push(arr[Math.round(i * step)]);
+    return out;
+};
+
 const PortfolioSummary = ({ history }) => {
     const theme = useTheme();
 
@@ -39,19 +53,23 @@ const PortfolioSummary = ({ history }) => {
     const sorted = [...history].reverse();
     const first = sorted[0];
     const last = sorted[sorted.length - 1];
-    const pnlChange = last.totalPnlPercent - first.totalPnlPercent;
+    const pnl = (h) => h.totalPnlPercent ?? 0;
+    const pnlChange = pnl(last) - pnl(first);
     const posChange = last.openPositionCount - first.openPositionCount;
+
+    // Stat tiles below use the full `history`; only the chart series is thinned.
+    const chartPoints = downsample(sorted, MAX_CHART_POINTS);
 
     const series = [
         {
             name: 'PnL %',
             type: 'area',
-            data: sorted.map((h) => ({ x: h.snapshotDate, y: h.totalPnlPercent }))
+            data: chartPoints.map((h) => ({ x: h.snapshotDate, y: h.totalPnlPercent ?? null }))
         },
         {
             name: 'Positions',
             type: 'line',
-            data: sorted.map((h) => ({ x: h.snapshotDate, y: h.openPositionCount }))
+            data: chartPoints.map((h) => ({ x: h.snapshotDate, y: h.openPositionCount }))
         }
     ];
 
@@ -77,10 +95,12 @@ const PortfolioSummary = ({ history }) => {
         colors: ['#fff', theme.palette.primary[200]],
         xaxis: {
             type: 'category',
+            tickAmount: Math.min(8, chartPoints.length),
             labels: {
                 style: { colors: theme.palette.primary.light },
                 rotate: -45,
-                rotateAlways: sorted.length > 5
+                rotateAlways: chartPoints.length > 5,
+                hideOverlappingLabels: true
             }
         },
         yaxis: [
@@ -180,20 +200,20 @@ const PortfolioSummary = ({ history }) => {
                         <Grid item xs={3} sm={2}>
                             <Box sx={{ backgroundColor: theme.palette.primary[800], borderRadius: 2, p: 1.5, textAlign: 'center' }}>
                                 <Typography variant="caption" sx={{ color: 'primary.light' }}>Start PnL</Typography>
-                                <Typography variant="h4" sx={{ color: '#fff' }}>{first.totalPnlPercent.toFixed(2)}%</Typography>
+                                <Typography variant="h4" sx={{ color: '#fff' }}>{pnl(first).toFixed(2)}%</Typography>
                             </Box>
                         </Grid>
                         <Grid item xs={3} sm={2}>
                             <Box sx={{ backgroundColor: theme.palette.primary[800], borderRadius: 2, p: 1.5, textAlign: 'center' }}>
                                 <Typography variant="caption" sx={{ color: 'primary.light' }}>Current PnL</Typography>
-                                <Typography variant="h4" sx={{ color: '#fff' }}>{last.totalPnlPercent.toFixed(2)}%</Typography>
+                                <Typography variant="h4" sx={{ color: '#fff' }}>{pnl(last).toFixed(2)}%</Typography>
                             </Box>
                         </Grid>
                         <Grid item xs={3} sm={2}>
                             <Box sx={{ backgroundColor: theme.palette.primary[800], borderRadius: 2, p: 1.5, textAlign: 'center' }}>
                                 <Typography variant="caption" sx={{ color: 'primary.light' }}>Peak PnL</Typography>
                                 <Typography variant="h4" sx={{ color: '#fff' }}>
-                                    {Math.max(...history.map((h) => h.totalPnlPercent)).toFixed(2)}%
+                                    {Math.max(...history.map(pnl)).toFixed(2)}%
                                 </Typography>
                             </Box>
                         </Grid>
@@ -201,7 +221,7 @@ const PortfolioSummary = ({ history }) => {
                             <Box sx={{ backgroundColor: theme.palette.primary[800], borderRadius: 2, p: 1.5, textAlign: 'center' }}>
                                 <Typography variant="caption" sx={{ color: 'primary.light' }}>Low PnL</Typography>
                                 <Typography variant="h4" sx={{ color: '#fff' }}>
-                                    {Math.min(...history.map((h) => h.totalPnlPercent)).toFixed(2)}%
+                                    {Math.min(...history.map(pnl)).toFixed(2)}%
                                 </Typography>
                             </Box>
                         </Grid>
