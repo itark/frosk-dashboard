@@ -1,6 +1,6 @@
 import { Box, Typography, Chip } from '@mui/material';
 import { useDataSource } from 'store/DataSourceContext';
-import { IconChartBar, IconCurrencyBitcoin, IconChartCandle } from '@tabler/icons';
+import { IconChartBar, IconCurrencyBitcoin } from '@tabler/icons';
 
 const SOURCES = [
     {
@@ -20,16 +20,10 @@ const SOURCES = [
         activeColor: '#ffb74d',
         chipBg: 'rgba(230,81,0,0.15)',
         chipBorder: 'rgba(230,81,0,0.3)'
-    },
-    {
-        key: 'kraken-futures',
-        label: 'Kraken',
-        chip: 'KRAKEN FUTURES',
-        Icon: IconChartCandle,
-        activeColor: '#7e57c2',
-        chipBg: 'rgba(94,53,177,0.15)',
-        chipBorder: 'rgba(94,53,177,0.3)'
     }
+    // Kraken (kraken-futures → :8082) is PARKED (2026-10-30) — not selectable in the UI.
+    // The DataSourceContext/menu/account-page code is left intact; to re-enable,
+    // restore this entry (key 'kraken-futures', label 'Kraken', Icon IconChartCandle).
 ];
 
 const DataSourceSwitch = () => {

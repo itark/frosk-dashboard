@@ -36,6 +36,14 @@ const CardWrapper = styled(MainCard)(({ theme }) => ({
 }));
 
 const fmtEur = (v) => (v != null ? Number(v).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '—');
+// Signed "+X.XX € (+Y.YY %)" — used for the unrealized/total PnL rows, which
+// (unlike realized PnL above) are genuinely expected to swing negative often.
+const fmtSignedEurPct = (eur, pct) => {
+    if (eur == null || pct == null) return '—';
+    const e = Number(eur);
+    const p = Number(pct);
+    return `${e >= 0 ? '+' : ''}${e.toFixed(2)} (${p >= 0 ? '+' : ''}${p.toFixed(2)}%)`;
+};
 
 const OpenPositionsTable = ({ positions }) => {
     const columns = useMemo(
@@ -91,24 +99,39 @@ const OpenPositionsTable = ({ positions }) => {
     return <MaterialReactTable table={table} />;
 };
 
-const CryptoPaperAccountCard = () => {
+/**
+ * `title`/`secondary` are optional card-header props — passed by the Kraken
+ * Konto page, which needs the card labelled next to the live-account column;
+ * omitted elsewhere the card renders headerless as before. `refreshKey` is a
+ * counter the caller bumps to force a refetch (that page polls every 30s).
+ */
+const CryptoPaperAccountCard = ({ title, secondary, refreshKey = 0 }) => {
     const theme = useTheme();
-    const { source, apiUrl } = useDataSource();
+    const { source, apiUrl, isKrakenFutures } = useDataSource();
     const [account, setAccount] = useState(null);
 
+    // Kraken Futures is USD-denominated; the spot-crypto process is EUR.
+    const ccy = isKrakenFutures ? 'USD' : 'EUR';
+
+    // Blank the card when the source changes so EUR figures from the previous
+    // backend never linger while the new process is queried. A refreshKey tick
+    // deliberately does NOT clear it — the poll replaces the numbers in place.
     useEffect(() => {
         setAccount(null);
+    }, [source]);
+
+    useEffect(() => {
         fetch(apiUrl('/crypto/paper-account'))
             .then((res) => (res.ok ? res.json() : null))
             .then((data) => setAccount(data))
             .catch(() => setAccount(null));
-    }, [source, apiUrl]);
+    }, [source, apiUrl, refreshKey]);
 
     const pnlPercent = account?.realizedPnlPercent != null ? Number(account.realizedPnlPercent) : null;
     const positions = account?.openPositions ?? [];
 
     return (
-        <MainCard>
+        <MainCard title={title} darkTitle={Boolean(title)} secondary={secondary}>
             <CardWrapper border={false} content={false}>
                 <Box sx={{ p: 2 }}>
                     <List sx={{ py: 0 }}>
@@ -136,7 +159,7 @@ const CryptoPaperAccountCard = () => {
                                 secondary={
                                     <Typography variant="subtitle2" sx={{ color: 'secondary.light', mt: 0.25 }}>
                                         {account
-                                            ? `Equity ${fmtEur(account.equityEur)} EUR · ${account.openPositionsCount} open`
+                                            ? `Equity ${fmtEur(account.equityEur)} ${ccy} · ${account.openPositionsCount} open`
                                             : 'Loading…'}
                                     </Typography>
                                 }
@@ -157,7 +180,7 @@ const CryptoPaperAccountCard = () => {
                                     Init capital
                                 </Typography>
                                 <Typography variant="subtitle1" sx={{ color: '#fff' }}>
-                                    {fmtEur(account.initCapitalEur)} EUR
+                                    {fmtEur(account.initCapitalEur)} {ccy}
                                 </Typography>
                             </Grid>
                             <Grid item xs={4}>
@@ -165,7 +188,7 @@ const CryptoPaperAccountCard = () => {
                                     Cash
                                 </Typography>
                                 <Typography variant="subtitle1" sx={{ color: '#fff' }}>
-                                    {fmtEur(account.cashEur)} EUR
+                                    {fmtEur(account.cashEur)} {ccy}
                                 </Typography>
                             </Grid>
                             <Grid item xs={4}>
@@ -173,7 +196,29 @@ const CryptoPaperAccountCard = () => {
                                     Realized PnL
                                 </Typography>
                                 <Typography variant="subtitle1" sx={{ color: '#fff' }}>
-                                    {fmtEur(account.realizedPnlEur)} EUR
+                                    {fmtEur(account.realizedPnlEur)} {ccy}
+                                </Typography>
+                            </Grid>
+                            <Grid item xs={6}>
+                                <Typography variant="caption" sx={{ color: 'secondary.light' }}>
+                                    Orealiserat
+                                </Typography>
+                                <Typography
+                                    variant="subtitle1"
+                                    sx={{ color: (account.unrealizedPnlEur ?? 0) >= 0 ? theme.palette.success.light : theme.palette.error.light }}
+                                >
+                                    {fmtSignedEurPct(account.unrealizedPnlEur, account.unrealizedPnlPct)} {ccy}
+                                </Typography>
+                            </Grid>
+                            <Grid item xs={6}>
+                                <Typography variant="caption" sx={{ color: 'secondary.light' }}>
+                                    Totalt
+                                </Typography>
+                                <Typography
+                                    variant="subtitle1"
+                                    sx={{ color: (account.totalPnlEur ?? 0) >= 0 ? theme.palette.success.light : theme.palette.error.light }}
+                                >
+                                    {fmtSignedEurPct(account.totalPnlEur, account.totalPnlPct)} {ccy}
                                 </Typography>
                             </Grid>
                         </Grid>

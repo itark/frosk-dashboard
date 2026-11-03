@@ -7,27 +7,34 @@ import { Divider, List, Typography } from '@mui/material';
 // project imports
 import NavItem from '../NavItem';
 import NavCollapse from '../NavCollapse';
+import { useDataSource } from 'store/DataSourceContext';
 
 // ==============================|| SIDEBAR MENU LIST GROUP ||============================== //
 
 const NavGroup = ({ item }) => {
     const theme = useTheme();
+    const { source } = useDataSource();
 
-    // menu list collapse & items
-    const items = item.children?.map((menu) => {
-        switch (menu.type) {
-            case 'collapse':
-                return <NavCollapse key={menu.id} menu={menu} level={1} />;
-            case 'item':
-                return <NavItem key={menu.id} item={menu} level={1} />;
-            default:
-                return (
-                    <Typography key={menu.id} variant="h6" color="error" align="center">
-                        Menu Items Error
-                    </Typography>
-                );
-        }
-    });
+    // menu list collapse & items — an entry may declare `sources: [...]` in
+    // menu-items to restrict itself to certain backends (e.g. "Kraken Konto"
+    // only exists on the kraken-futures process); entries without the field
+    // show for every source.
+    const items = item.children
+        ?.filter((menu) => !menu.sources || menu.sources.includes(source))
+        .map((menu) => {
+            switch (menu.type) {
+                case 'collapse':
+                    return <NavCollapse key={menu.id} menu={menu} level={1} />;
+                case 'item':
+                    return <NavItem key={menu.id} item={menu} level={1} />;
+                default:
+                    return (
+                        <Typography key={menu.id} variant="h6" color="error" align="center">
+                            Menu Items Error
+                        </Typography>
+                    );
+            }
+        });
 
     return (
         <>

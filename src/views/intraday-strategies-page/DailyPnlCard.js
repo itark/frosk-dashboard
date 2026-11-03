@@ -57,6 +57,7 @@ function aggregateByDay(tickers) {
 const DailyPnlCard = () => {
     const theme = useTheme();
     const [data, setData] = useState([]);
+    const [paper, setPaper] = useState(null);
     const { source, apiUrl } = useDataSource();
 
     useEffect(() => {
@@ -69,7 +70,41 @@ const DailyPnlCard = () => {
             .catch(() => setData([]));
     }, [source, apiUrl]);
 
-    const daily = useMemo(() => aggregateByDay(data), [data]);
+    // Coinbase: what the paper account actually traded (EUR, net of fees, sized positions).
+    // /intraday/pnl sums the percentage of every signal with equal weight, which ignores
+    // position sizing and the signals the paper engine skipped, and so overstates both
+    // gains and losses. Any other source, or an unreachable endpoint, keeps the signal view.
+    useEffect(() => {
+        if (source !== 'crypto') {
+            setPaper(null);
+            return;
+        }
+        fetch(apiUrl('/crypto/paper-daily-pnl?days=365'))
+            .then((res) => (res.ok ? res.json() : null))
+            .then((json) => setPaper(json && Array.isArray(json.days) ? json : null))
+            .catch(() => setPaper(null));
+    }, [source, apiUrl]);
+
+    const paperMode = paper !== null && paper.days.length > 0;
+    const unit = paperMode ? ' €' : '%';
+    const fmtVal = (val, digits) => val.toFixed(digits) + unit;
+
+    const daily = useMemo(
+        () =>
+            paperMode
+                ? paper.days.map((d) => ({
+                      date: d.date,
+                      trades: d.trades,
+                      wins: d.wins,
+                      losses: d.losses,
+                      pnl: Number(d.pnlEur),
+                      pctOfCapital: d.pnlPctOfCapital != null ? Number(d.pnlPctOfCapital) : null,
+                      avgTradePct: d.avgTradePct != null ? Number(d.avgTradePct) : null,
+                      hasPending: false
+                  }))
+                : aggregateByDay(data),
+        [data, paper, paperMode]
+    );
 
     const cumulative = useMemo(() => {
         let sum = 0;
@@ -80,18 +115,19 @@ const DailyPnlCard = () => {
     }, [daily]);
 
     const totalPnl = cumulative.length > 0 ? cumulative[cumulative.length - 1].cumPnl : 0;
+    const totalPctOfCapital = paperMode && paper.windowPnlPctOfCapital != null ? Number(paper.windowPnlPctOfCapital) : null;
     const winDays = daily.filter((d) => d.pnl > 0).length;
     const lossDays = daily.filter((d) => d.pnl < 0).length;
     const anyPending = daily.some((d) => d.hasPending);
 
     const series = [
         {
-            name: 'Daily P&L %',
+            name: paperMode ? 'Daily P&L €' : 'Daily P&L %',
             type: 'bar',
             data: cumulative.map((d) => ({ x: d.date, y: parseFloat(d.pnl.toFixed(2)) }))
         },
         {
-            name: 'Cumulative P&L %',
+            name: paperMode ? 'Cumulative P&L €' : 'Cumulative P&L %',
             type: 'line',
             data: cumulative.map((d) => ({ x: d.date, y: parseFloat(d.cumPnl.toFixed(2)) }))
         }
@@ -129,18 +165,18 @@ const DailyPnlCard = () => {
         },
         yaxis: [
             {
-                title: { text: 'Daily P&L %', style: { color: '#fff' } },
+                title: { text: paperMode ? 'Daily P&L €' : 'Daily P&L %', style: { color: '#fff' } },
                 labels: {
                     style: { colors: '#fff' },
-                    formatter: (val) => val.toFixed(1) + '%'
+                    formatter: (val) => fmtVal(val, 1)
                 }
             },
             {
                 opposite: true,
-                title: { text: 'Cumulative %', style: { color: theme.palette.primary[200] } },
+                title: { text: paperMode ? 'Cumulative €' : 'Cumulative %', style: { color: theme.palette.primary[200] } },
                 labels: {
                     style: { colors: theme.palette.primary[200] },
-                    formatter: (val) => val.toFixed(1) + '%'
+                    formatter: (val) => fmtVal(val, 1)
                 }
             }
         ],
@@ -148,7 +184,7 @@ const DailyPnlCard = () => {
             theme: 'dark',
             shared: true,
             y: {
-                formatter: (val) => val.toFixed(2) + '%'
+                formatter: (val) => fmtVal(val, 2)
             }
         },
         grid: {
@@ -191,7 +227,7 @@ const DailyPnlCard = () => {
             },
             {
                 accessorKey: 'pnl',
-                header: 'P&L %',
+                header: paperMode ? 'P&L €' : 'P&L %',
                 size: 10,
                 Cell: ({ cell }) => (
                     <Typography
@@ -201,12 +237,34 @@ const DailyPnlCard = () => {
                             color: cell.getValue() >= 0 ? theme.palette.success.main : theme.palette.error.main
                         }}
                     >
-                        {cell.getValue() >= 0 ? '+' : ''}{cell.getValue().toFixed(2)}%
+                        {cell.getValue() >= 0 ? '+' : ''}{cell.getValue().toFixed(2)}{unit}
                     </Typography>
                 ),
             },
+            ...(paperMode
+                ? [
+                      {
+                          accessorKey: 'pctOfCapital',
+                          header: '% of capital',
+                          size: 10,
+                          Cell: ({ cell }) => {
+                              const v = cell.getValue();
+                              return v == null ? '-' : (v >= 0 ? '+' : '') + v.toFixed(2) + '%';
+                          },
+                      },
+                      {
+                          accessorKey: 'avgTradePct',
+                          header: 'Avg trade %',
+                          size: 10,
+                          Cell: ({ cell }) => {
+                              const v = cell.getValue();
+                              return v == null ? '-' : (v >= 0 ? '+' : '') + v.toFixed(2) + '%';
+                          },
+                      },
+                  ]
+                : []),
         ],
-        [theme.palette.success.main, theme.palette.error.main],
+        [theme.palette.success.main, theme.palette.error.main, paperMode, unit],
     );
 
     const table = useMaterialReactTable({
@@ -219,90 +277,7 @@ const DailyPnlCard = () => {
         },
     });
 
-    const todayRoundTrips = useMemo(() => {
-        const today = new Date().toLocaleDateString('sv-SE');
-        const rows = [];
-        for (const item of data) {
-            for (const trade of item.trades || []) {
-                if (trade.sellTime && trade.sellTime.startsWith(today)) {
-                    rows.push({
-                        ticker: item.ticker,
-                        strategy: (item.strategyName || '').replace('Strategy', ''),
-                        preRegistrationPending: item.preRegistrationPending,
-                        buyPrice: trade.buyPrice,
-                        sellPrice: trade.sellPrice,
-                        pnlPercent: trade.pnlPercent,
-                        entryTime: trade.buyTime ? trade.buyTime.slice(11, 16) : '-',
-                        exitTime: trade.sellTime ? trade.sellTime.slice(11, 16) : '-',
-                    });
-                }
-            }
-        }
-        return rows;
-    }, [data]);
-
-    const roundTripColumns = useMemo(
-        () => [
-            { accessorKey: 'ticker', header: 'Ticker', size: 80 },
-            {
-                accessorKey: 'strategy',
-                header: 'Strategi',
-                size: 120,
-                Cell: ({ cell, row }) => (
-                    <>
-                        {cell.getValue()}
-                        {row.original.preRegistrationPending && <PreRegistrationBadge />}
-                    </>
-                ),
-            },
-            {
-                accessorKey: 'buyPrice',
-                header: 'Entry-pris',
-                size: 90,
-                Cell: ({ cell }) => cell.getValue() != null ? Number(cell.getValue()).toFixed(2) : '-',
-            },
-            {
-                accessorKey: 'sellPrice',
-                header: 'Exit-pris',
-                size: 90,
-                Cell: ({ cell }) => cell.getValue() != null ? Number(cell.getValue()).toFixed(2) : '-',
-            },
-            {
-                accessorKey: 'pnlPercent',
-                header: 'PnL%',
-                size: 80,
-                Cell: ({ cell }) => {
-                    const val = cell.getValue();
-                    return (
-                        <Typography
-                            variant="body2"
-                            sx={{
-                                fontWeight: 'bold',
-                                color: val >= 0 ? theme.palette.success.main : theme.palette.error.main
-                            }}
-                        >
-                            {val >= 0 ? '+' : ''}{val != null ? Number(val).toFixed(2) : '0'}%
-                        </Typography>
-                    );
-                },
-            },
-            { accessorKey: 'entryTime', header: 'Entry-tid', size: 80 },
-            { accessorKey: 'exitTime', header: 'Exit-tid', size: 80 },
-        ],
-        [theme.palette.success.main, theme.palette.error.main],
-    );
-
-    const roundTripTable = useMaterialReactTable({
-        columns: roundTripColumns,
-        data: todayRoundTrips,
-        enableTopToolbar: false,
-        initialState: {
-            density: 'compact',
-            sorting: [{ id: 'exitTime', desc: true }],
-        },
-    });
-
-    if (data.length === 0) return null;
+    if (data.length === 0 && !paperMode) return null;
 
     return (
         <MainCard>
@@ -332,7 +307,9 @@ const DailyPnlCard = () => {
                                 }
                                 secondary={
                                     <Typography variant="subtitle2" sx={{ color: 'primary.light', mt: 0.25 }}>
-                                        Signal results per day ({daily.length} trading days)
+                                        {paperMode
+                                            ? `Paper account, net of fees (${daily.length} trading days)`
+                                            : `Signal results per day, not real P&L (${daily.length} trading days)`}
                                     </Typography>
                                 }
                             />
@@ -345,8 +322,13 @@ const DailyPnlCard = () => {
                                         variant="h4"
                                         sx={{ color: totalPnl >= 0 ? theme.palette.success.light : theme.palette.error.light }}
                                     >
-                                        {totalPnl >= 0 ? '+' : ''}{totalPnl.toFixed(2)}%
+                                        {totalPnl >= 0 ? '+' : ''}{totalPnl.toFixed(2)}{unit}
                                     </Typography>
+                                    {totalPctOfCapital !== null && (
+                                        <Typography variant="caption" sx={{ color: 'primary.light' }}>
+                                            {totalPctOfCapital >= 0 ? '+' : ''}{totalPctOfCapital.toFixed(2)}% of capital
+                                        </Typography>
+                                    )}
                                 </Box>
                                 <Box textAlign="center">
                                     <Typography variant="caption" sx={{ color: 'primary.light' }}>Win days</Typography>
@@ -366,15 +348,9 @@ const DailyPnlCard = () => {
                 </Box>
             </CardWrapper>
 
-            {todayRoundTrips.length > 0 && (
-                <Grid item sx={{ mt: 2 }}>
-                    <Typography variant="h5" sx={{ mb: 1, px: 1, color: 'text.secondary' }}>
-                        Stängda round-trips idag ({todayRoundTrips.length})
-                    </Typography>
-                    <MaterialReactTable table={roundTripTable} />
-                </Grid>
-            )}
-
+            {/* "Stängda round-trips idag" disabled 2026-09-17 — overlapped with
+                Today's Signals (also since removed) and pushed this table, the
+                one that actually belongs directly under the graph, further down. */}
             <Grid item sx={{ mt: 2 }}>
                 <MaterialReactTable table={table} />
             </Grid>

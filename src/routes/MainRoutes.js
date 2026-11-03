@@ -21,6 +21,8 @@ const ContainerPage = Loadable(lazy(() => import('views/container-page')));
 const IndexPage = Loadable(lazy(() => import('views/index-page')));
 const PortfolioPage = Loadable(lazy(() => import('views/portfolio-page')));
 const IntradayStrategiesPage = Loadable(lazy(() => import('views/intraday-strategies-page')));
+const KrakenAccountPage = Loadable(lazy(() => import('views/kraken-account-page')));
+const CoinbaseAccountPage = Loadable(lazy(() => import('views/coinbase-account-page')));
 
 // ==============================|| MAIN ROUTING ||============================== //
 
@@ -109,6 +111,14 @@ const MainRoutes = {
         {
             path: 'intraday-strategies-page',
             element: <IntradayStrategiesPage />
+        },
+        {
+            path: 'kraken-account-page',
+            element: <KrakenAccountPage />
+        },
+        {
+            path: 'coinbase-account-page',
+            element: <CoinbaseAccountPage />
         },
     ]
 };

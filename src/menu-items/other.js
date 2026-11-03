@@ -1,8 +1,8 @@
 // assets
-import { IconBrandChrome, IconHelp, IconHandRock, IconRocket, IconTrendingUp, IconWallet, IconClock } from '@tabler/icons';
+import { IconBrandChrome, IconHelp, IconHandRock, IconRocket, IconTrendingUp, IconWallet, IconClock, IconBuildingBank, IconCoin } from '@tabler/icons';
 
 // constant
-const icons = { IconBrandChrome, IconHelp, IconHandRock, IconRocket, IconTrendingUp, IconWallet, IconClock };
+const icons = { IconBrandChrome, IconHelp, IconHandRock, IconRocket, IconTrendingUp, IconWallet, IconClock, IconBuildingBank, IconCoin };
 
 // ==============================|| SAMPLE PAGE & DOCUMENTATION MENU ITEMS ||============================== //
 
@@ -49,6 +49,28 @@ const other = {
             url: '/intraday-strategies-page',
             icon: icons.IconClock,
             breadcrumbs: false
+        },
+        {
+            // Reads the Kraken Futures process on :8082 only — `sources` keeps it out
+            // of the menu for the equity and Coinbase sources (see NavGroup).
+            id: 'kraken-account-page',
+            title: 'Kraken Konto',
+            type: 'item',
+            url: '/kraken-account-page',
+            icon: icons.IconBuildingBank,
+            breadcrumbs: false,
+            sources: ['kraken-futures']
+        },
+        {
+            // Reads the Coinbase (crypto) process on :8081 only — `sources` keeps it
+            // out of the menu for the equity and Kraken Futures sources (see NavGroup).
+            id: 'coinbase-account-page',
+            title: 'Coinbase Konto',
+            type: 'item',
+            url: '/coinbase-account-page',
+            icon: icons.IconCoin,
+            breadcrumbs: false,
+            sources: ['crypto']
         },
         {
             id: 'index-page',
